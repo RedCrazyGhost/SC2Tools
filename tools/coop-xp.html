@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>合作模式经验计算器 - 星际争霸2工具站</title>
-  <meta name="description" content="星际争霸2合作模式经验计算器：按固定基础经验、奖励目标经验、难度加成、随机加成与首胜规则计算每局经验，并支持每周突变奖励与升级所需对局数估算。">
+  <meta name="description" content="星际争霸2合作模式经验计算器：支持指挥官/精通等级经验计算、目标经验同步、合作任务计划日历自动规划与突变奖励结算。">
   <link rel="canonical" href="https://example.com/tools/coop-xp.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="合作模式经验计算器">
@@ -30,6 +30,7 @@
       <nav aria-label="主导航">
         <ul class="nav-list">
           <li><a href="../index.html">首页</a></li>
+          <li><a href="./single-xp.html">单局经验</a></li>
           <li><a aria-current="page" href="./coop-xp.html">经验计算器</a></li>
           <li><a href="./replay-viewer.html">Replay查看</a></li>
         </ul>
@@ -42,156 +43,125 @@
       <a href="../index.html">首页</a> / <span>经验计算器</span>
     </nav>
     <section>
-      <h2>计算模式</h2>
+      <h2>合作任务计划日历</h2>
+      <h3>计算模式</h3>
       <div class="form-grid">
         <button id="mode-commander-btn" type="button" aria-pressed="true">指挥官经验计算</button>
         <button id="mode-mastery-btn" type="button" aria-pressed="false">精通经验计算</button>
       </div>
-    </section>
-    <section>
-      <h2>单局游戏经验</h2>
-      <form id="xp-form" class="form-grid">
-        <label>
-          任务类型
-          <select name="taskType" required>
-            <option value="normal">普通任务</option>
-            <option value="mutation">突变任务</option>
-          </select>
-        </label>
-        <label>
-          难度
-          <select name="difficulty" required>
-            <option value="casual">休闲</option>
-            <option value="normal">普通</option>
-            <option value="hard">困难</option>
-            <option value="brutal">残酷</option>
-            <option value="brutal1">残酷+1</option>
-            <option value="brutal2">残酷+2</option>
-            <option value="brutal3">残酷+3</option>
-            <option value="brutal4">残酷+4</option>
-            <option value="brutal5">残酷+5</option>
-            <option value="brutal6">残酷+6</option>
-          </select>
-        </label>
-        <label class="checkbox">
-          <input name="randomMapBonus" type="checkbox">
-          随机地图（+25%）
-        </label>
-        <label class="checkbox">
-          <input name="firstWinBonus" type="checkbox">
-          <span id="first-win-bonus-label">每日首胜</span>
-        </label>
-      </form>
-    </section>
 
-    <section aria-live="polite">
-      <h2>计算结果</h2>
-      <div id="xp-result" class="card"></div>
-    </section>
+      <div data-mode-section="commander">
+        <h3>指挥官升级经验计算</h3>
+        <p>根据“起始等级+当前经验”到“目标等级+目标经验”，计算需要获得经验，可手动同步到计划日历目标经验。</p>
+        <form id="leveling-form" class="form-grid">
+          <label>
+            起始等级
+            <select name="startLevel" required>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+          <label>
+            起始等级当前经验
+            <input name="startLevelXp" type="number" min="0" step="1" value="0" required>
+          </label>
+          <label>
+            目标等级
+            <select name="targetLevel" required>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15" selected>15</option>
+            </select>
+          </label>
+          <label>
+            目标等级当前经验
+            <input name="targetLevelXp" type="number" min="0" step="1" value="0" required>
+          </label>
+          <div class="xp-range-field" data-range-mode="commander">
+            <p class="xp-range-label">等级经验区间（拖拽两端）</p>
+            <div class="xp-dual-range" data-dual-range="commander">
+              <div class="xp-dual-track">
+                <div class="xp-dual-ticks" aria-hidden="true"></div>
+                <div class="xp-dual-selected"></div>
+              </div>
+              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="1045000" step="1" value="0" aria-label="起始总经验">
+              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="1045000" step="1" value="1045000" aria-label="目标总经验">
+            </div>
+          </div>
+        </form>
+        <div id="leveling-result" class="card" aria-live="polite"></div>
+      </div>
 
-    <section data-mode-section="commander">
-      <h2>指挥官升级对局数估算</h2>
-      <p>根据“起始等级+当前经验”到“目标等级+目标经验”，结合当前每局经验，估算还需对局数。</p>
-      <form id="leveling-form" class="form-grid">
-        <label>
-          起始等级
-          <select name="startLevel" required>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-          </select>
-        </label>
-        <label>
-          起始等级当前经验
-          <input name="startLevelXp" type="number" min="0" step="1" value="0" required>
-        </label>
-        <label>
-          目标等级
-          <select name="targetLevel" required>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15" selected>15</option>
-          </select>
-        </label>
-        <label>
-          目标等级当前经验
-          <input name="targetLevelXp" type="number" min="0" step="1" value="0" required>
-        </label>
-      </form>
-      <div id="leveling-result" class="card" aria-live="polite"></div>
-    </section>
-
-    <section data-mode-section="mastery" hidden>
-      <h2>精通/晋升等级对局数估算</h2>
-      <p>精通0-90按固定经验表计算；90级及以上按每级200000经验计算（晋升）。</p>
-      <form id="mastery-form" class="form-grid">
-        <label>
-          起始精通/晋升等级
-          <input name="startMasteryLevel" type="number" min="0" step="1" value="0" required>
-        </label>
-        <label>
-          起始等级当前经验
-          <input name="startMasteryXp" type="number" min="0" step="1" value="0" required>
-        </label>
-        <label>
-          目标精通/晋升等级
-          <input name="targetMasteryLevel" type="number" min="0" step="1" value="90" required>
-        </label>
-        <label>
-          目标等级当前经验
-          <input name="targetMasteryXp" type="number" min="0" step="1" value="0" required>
-        </label>
-      </form>
-      <div id="mastery-result" class="card" aria-live="polite"></div>
-    </section>
-
-    <section>
-      <h2>合作任务排程日历</h2>
-      <form id="schedule-form" class="form-grid">
-        <label>
-          开始日期
-          <input name="startDate" type="date" required>
-        </label>
-        <label>
-          每日目标局数
-          <input name="dailyGamesTarget" type="number" min="1" step="1" value="3" required>
-        </label>
-        <label class="checkbox">
-          <input name="includeWeeklyMutation" type="checkbox">
-          每周完成突变任务（折算减少局数）
-        </label>
-        <button id="generate-schedule-btn" type="button">自动规划</button>
-      </form>
-
-      <div id="schedule-summary" class="card" aria-live="polite">
-        <p>填写参数并点击“自动规划”。</p>
+      <div data-mode-section="mastery" hidden>
+        <h3>精通/晋升等级经验计算</h3>
+        <p>精通0-90按固定经验表计算；90-1000级按每级200000经验计算（晋升）。</p>
+        <form id="mastery-form" class="form-grid">
+          <label>
+            起始精通/晋升等级
+            <input name="startMasteryLevel" type="number" min="0" max="1000" step="1" value="0" required>
+          </label>
+          <label>
+            起始等级当前经验
+            <input name="startMasteryXp" type="number" min="0" step="1" value="0" required>
+          </label>
+          <label>
+            目标精通/晋升等级
+            <input name="targetMasteryLevel" type="number" min="0" max="1000" step="1" value="90" required>
+          </label>
+          <label>
+            目标等级当前经验
+            <input name="targetMasteryXp" type="number" min="0" step="1" value="0" required>
+          </label>
+          <div class="xp-range-field" data-range-mode="mastery">
+            <p class="xp-range-label">等级经验区间（拖拽两端）</p>
+            <div class="xp-dual-range" data-dual-range="mastery">
+              <div class="xp-dual-track">
+                <div class="xp-dual-ticks" aria-hidden="true"></div>
+                <div class="xp-dual-selected"></div>
+              </div>
+              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="15919000" step="1" value="0" aria-label="起始总经验">
+              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="15919000" step="1" value="15919000" aria-label="目标总经验">
+            </div>
+          </div>
+        </form>
+        <div id="mastery-result" class="card" aria-live="polite"></div>
       </div>
 
       <h3>计划日历</h3>
+      <form id="schedule-form" class="form-grid">
+        <label>
+          目标经验（xp）
+          <input name="targetXp" type="number" min="1" step="1" value="100000" required>
+        </label>
+      </form>
+      <div id="schedule-summary" class="card" aria-live="polite">
+        <p>填写参数并点击“自动规划”。</p>
+      </div>
       <div class="calendar-list-header">
         <div class="calendar-toolbar-nav">
           <button id="calendar-prev-month-btn" class="calendar-icon-btn" type="button" title="上月" aria-label="上月">
@@ -203,8 +173,14 @@
           <button id="calendar-today-btn" class="calendar-icon-btn" type="button" title="返回今天" aria-label="返回今天">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2.8 2.75 5.58 6.16.9-4.45 4.34 1.05 6.14L12 16.9 6.49 19.76l1.06-6.14L3.1 9.28l6.16-.9L12 2.8Z"/></svg>
           </button>
+          <button id="calendar-auto-plan-btn" class="calendar-icon-btn" type="button" title="自动规划" aria-label="自动规划">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5v2a1 1 0 1 1-2 0V5H7v14h4a1 1 0 1 1 0 2H6.5A1.5 1.5 0 0 1 5 19.5v-15Zm9.22 6.22a1 1 0 0 1 1.41 0l3.37 3.37a1 1 0 0 1 0 1.41l-3.37 3.37a1 1 0 1 1-1.41-1.41L15.88 16H11a1 1 0 1 1 0-2h4.88l-1.66-1.66a1 1 0 0 1 0-1.41Z"/></svg>
+          </button>
           <button id="calendar-bulk-add-btn" class="calendar-icon-btn" type="button" title="批量添加普通任务" aria-label="批量添加普通任务">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v1A1.5 1.5 0 0 1 18.5 9h-13A1.5 1.5 0 0 1 4 7.5v-1Zm0 5A1.5 1.5 0 0 1 5.5 10h13a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 12.5v-1Zm1.5 3.5h13A1.5 1.5 0 0 1 20 16.5v1a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-1A1.5 1.5 0 0 1 5.5 15Z"/></svg>
+          </button>
+          <button id="calendar-export-ics-btn" class="calendar-icon-btn" type="button" title="导出日历计划 (.ics)" aria-label="导出日历计划 (.ics)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42L11 12.59V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1a1 1 0 0 1 1-1Z"/></svg>
           </button>
           <button id="calendar-clear-btn" class="calendar-icon-btn danger" type="button" title="删除所有计划" aria-label="删除所有计划">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4h4a1 1 0 1 1 0 2h-1v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6H5a1 1 0 1 1 0-2h4v-.5ZM8 6v13h8V6H8Zm2 3a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Z"/></svg>
@@ -222,7 +198,7 @@
     <section>
       <h2>公式说明</h2>
       <p>每局游戏经验 = (基础经验 + 奖励目标经验) × (1 + 难度加成 + 随机加成) + 首胜经验 + （每周第一次完成时的累积难度奖励）</p>
-      <p>基础经验：20000（固定） | 奖励目标经验：2000（固定） | 随机加成：随机地图时25% | 首胜经验：10000</p>
+      <p>基础经验：20000 xp（固定） | 奖励目标经验：2000 xp（固定） | 随机加成：随机地图时25% | 首胜经验：10000 xp</p>
       <p>经验列表速查：</p>
       <ul>
         <li><a href="./commander-xp-table.html">指挥官1-15级经验列表</a></li>
@@ -320,6 +296,105 @@
       <div class="calendar-editor-actions">
         <button id="calendar-bulk-save-btn" type="button">批量添加</button>
         <button id="calendar-bulk-cancel-btn" type="button">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="calendar-auto-plan-modal" class="calendar-editor-modal" hidden>
+    <div class="calendar-editor-backdrop" data-close-auto-plan-modal="true"></div>
+    <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-auto-plan-title">
+      <h3 id="calendar-auto-plan-title">自动规划参数</h3>
+      <form id="calendar-auto-plan-form">
+        <section class="auto-plan-group">
+          <h4>普通任务</h4>
+          <div class="form-grid">
+            <label>
+              开始日期
+              <input name="autoPlanStartDate" type="date" required>
+            </label>
+            <label>
+              每日普通任务局数
+              <input name="autoPlanDailyNormalGames" type="number" min="1" step="1" value="3" required>
+            </label>
+            <label>
+              普通任务难度
+              <select name="autoPlanDifficulty" required>
+                <option value="casual">休闲</option>
+                <option value="normal">普通</option>
+                <option value="hard">困难</option>
+                <option value="brutal">残酷</option>
+                <option value="brutal1">残酷+1</option>
+                <option value="brutal2">残酷+2</option>
+                <option value="brutal3">残酷+3</option>
+                <option value="brutal4">残酷+4</option>
+                <option value="brutal5">残酷+5</option>
+                <option value="brutal6">残酷+6</option>
+              </select>
+            </label>
+            <label class="auto-plan-toggle">
+              <span class="auto-plan-toggle-title">随机地图加成</span>
+              <span class="auto-plan-toggle-control">
+                <input name="autoPlanRandomMapBonus" type="checkbox">
+                随机地图（+25%）
+              </span>
+            </label>
+          </div>
+        </section>
+        <section class="auto-plan-group">
+          <h4>突变任务</h4>
+          <div class="form-grid">
+            <label>
+              <span class="label-with-tip">
+                突变任务等级
+                <span class="help-tip" tabindex="0" role="note" aria-label="仅影响每周额外突变任务与其奖励，不影响普通任务">?</span>
+              </span>
+              <select name="autoPlanMutationDifficulty" required>
+                <option value="casual">休闲</option>
+                <option value="normal">普通</option>
+                <option value="hard">困难</option>
+                <option value="savage" selected>残酷</option>
+              </select>
+            </label>
+            <label class="auto-plan-toggle">
+              <span class="label-with-tip auto-plan-toggle-title">
+                挑战突变任务（每周额外安排）
+                <span class="help-tip" tabindex="0" role="note" aria-label="开启后会在每周额外安排 1 场突变任务">?</span>
+              </span>
+              <span class="auto-plan-toggle-control">
+                <input name="autoPlanChallengeMutation" type="checkbox">
+                启用挑战突变任务
+              </span>
+            </label>
+          </div>
+        </section>
+      </form>
+      <div class="calendar-editor-actions">
+        <button id="calendar-auto-plan-generate-btn" type="button">生成计划</button>
+        <button id="calendar-auto-plan-cancel-btn" type="button">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="calendar-export-modal" class="calendar-editor-modal" hidden>
+    <div class="calendar-editor-backdrop" data-close-export-modal="true"></div>
+    <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-export-title">
+      <h3 id="calendar-export-title">导出日历计划（.ics）</h3>
+      <form id="calendar-export-form" class="form-grid">
+        <label>
+          导出范围
+          <select name="exportScope" required>
+            <option value="all" selected>全部计划任务</option>
+            <option value="currentMonth">当前显示月份</option>
+          </select>
+        </label>
+        <label>
+          事件开始时间
+          <input name="exportStartTime" type="time" value="20:00" required>
+        </label>
+      </form>
+      <div class="calendar-editor-actions">
+        <button id="calendar-export-confirm-btn" type="button">导出 .ics</button>
+        <button id="calendar-export-cancel-btn" type="button">取消</button>
       </div>
     </section>
   </div>

@@ -20,6 +20,7 @@
       <nav aria-label="主导航">
         <ul class="nav-list">
           <li><a href="../index.html">首页</a></li>
+          <li><a href="./single-xp.html">单局经验</a></li>
           <li><a href="./coop-xp.html">经验计算器</a></li>
           <li><a href="./replay-viewer.html">Replay查看</a></li>
         </ul>
@@ -39,8 +40,8 @@
           <thead>
             <tr>
               <th scope="col">等级</th>
-              <th scope="col">到下一等级所需经验</th>
-              <th scope="col">当前等级累计经验</th>
+              <th scope="col">到下一等级所需经验（xp）</th>
+              <th scope="col">当前等级累计经验（xp）</th>
             </tr>
           </thead>
           <tbody>
@@ -62,7 +63,7 @@
           </tbody>
         </table>
       </div>
-      <p class="hint">注：15级已满级，故“到下一等级所需经验”为0。</p>
+      <p class="hint">注：15级已满级，故“到下一等级所需经验”为0 xp。</p>
     </section>
   </main>
 
@@ -71,5 +72,15 @@
       <p>© 2026 星际争霸2工具站</p>
     </div>
   </footer>
+  <script>
+    (function () {
+      const cells = document.querySelectorAll(".xp-table tbody td:nth-child(2), .xp-table tbody td:nth-child(3)");
+      cells.forEach(function (cell) {
+        const text = cell.textContent ? cell.textContent.trim() : "";
+        if (!text || /xp$/i.test(text)) return;
+        cell.textContent = `${text} xp`;
+      });
+    })();
+  </script>
 </body>
 </html>

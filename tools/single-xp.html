@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>单局游戏经验计算 - 星际争霸2工具站</title>
+  <meta name="description" content="星际争霸2合作模式单局游戏经验计算：按固定基础经验、奖励目标经验、难度加成、随机加成与首胜规则计算每局经验。">
+  <link rel="canonical" href="https://example.com/tools/single-xp.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="单局游戏经验计算">
+  <meta property="og:description" content="按公开官方规则估算单局合作经验。">
+  <meta property="og:url" content="https://example.com/tools/single-xp.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">单局游戏经验计算</h1>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="../index.html">首页</a></li>
+          <li><a href="./single-xp.html" aria-current="page">单局经验</a></li>
+          <li><a href="./coop-xp.html">经验计算器</a></li>
+          <li><a href="./replay-viewer.html">Replay查看</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="../index.html">首页</a> / <span>单局经验</span>
+    </nav>
+
+    <section>
+      <h2>单局游戏经验</h2>
+      <form id="xp-form" class="form-grid">
+        <label>
+          任务类型
+          <select name="taskType" required>
+            <option value="normal">普通任务</option>
+            <option value="mutation">突变任务</option>
+          </select>
+        </label>
+        <label>
+          难度
+          <select name="difficulty" required>
+            <option value="casual">休闲</option>
+            <option value="normal">普通</option>
+            <option value="hard">困难</option>
+            <option value="brutal">残酷</option>
+            <option value="brutal1">残酷+1</option>
+            <option value="brutal2">残酷+2</option>
+            <option value="brutal3">残酷+3</option>
+            <option value="brutal4">残酷+4</option>
+            <option value="brutal5">残酷+5</option>
+            <option value="brutal6">残酷+6</option>
+          </select>
+        </label>
+        <label class="checkbox">
+          <input name="randomMapBonus" type="checkbox">
+          随机地图（+25%）
+        </label>
+        <label class="checkbox">
+          <input name="firstWinBonus" type="checkbox">
+          <span id="first-win-bonus-label">每日首胜</span>
+        </label>
+      </form>
+    </section>
+
+    <section aria-live="polite">
+      <h2>计算结果</h2>
+      <div id="xp-result" class="card"></div>
+    </section>
+
+    <section>
+      <h2>公式说明</h2>
+      <p>每局游戏经验 = (基础经验 + 奖励目标经验) × (1 + 难度加成 + 随机加成) + 首胜经验 + （每周第一次完成时的累积难度奖励）</p>
+      <p>基础经验：20000 xp（固定） | 奖励目标经验：2000 xp（固定） | 随机加成：随机地图时25% | 首胜经验：10000 xp</p>
+      <p>经验列表速查：</p>
+      <ul>
+        <li><a href="./commander-xp-table.html">指挥官1-15级经验列表</a></li>
+        <li><a href="./mastery-xp-table.html">精通0-90级经验列表</a></li>
+        <li><a href="./mutation-reward-table.html">每周突变奖励说明</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 星际争霸2工具站</p>
+    </div>
+  </footer>
+  <script defer src="../assets/js/single-xp.js"></script>
+</body>
+</html>
