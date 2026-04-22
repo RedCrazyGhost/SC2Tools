@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Replay在线查看 - 星际争霸2工具站</title>
+  <meta name="description" content="在浏览器本地解析SC2Replay文件，快速查看地图、玩家、种族、模式、时长和版本等元数据。">
+  <link rel="canonical" href="https://example.com/tools/replay-viewer.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Replay在线查看">
+  <meta property="og:description" content="本地解析SC2Replay文件，不上传服务器。">
+  <meta property="og:url" content="https://example.com/tools/replay-viewer.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "星际争霸2Replay在线查看",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web",
+      "url": "https://example.com/tools/replay-viewer.html"
+    }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">Replay在线查看</h1>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="../index.html">首页</a></li>
+          <li><a href="./coop-xp.html">经验计算器</a></li>
+          <li><a aria-current="page" href="./replay-viewer.html">Replay查看</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="../index.html">首页</a> / <span>Replay在线查看</span>
+    </nav>
+
+    <section>
+      <h2>上传Replay文件</h2>
+      <p>仅支持本地解析，文件不会上传服务器。支持扩展名：<code>.SC2Replay</code></p>
+      <input id="replay-file-input" type="file" accept=".SC2Replay,.sc2replay">
+      <div id="parse-status" class="hint">等待上传文件...</div>
+    </section>
+
+    <section aria-live="polite">
+      <h2>对局元数据</h2>
+      <div id="replay-meta" class="card">
+        <p>上传文件后显示解析结果。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 星际争霸2工具站</p>
+    </div>
+  </footer>
+  <script defer src="../assets/js/replay-parser-adapter.js"></script>
+  <script defer src="../assets/js/replay-viewer.js"></script>
+</body>
+</html>

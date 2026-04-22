@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>合作模式经验计算器 - 星际争霸2工具站</title>
+  <meta name="description" content="星际争霸2合作模式经验计算器：按固定基础经验、奖励目标经验、难度加成、随机加成与首胜规则计算每局经验，并支持每周突变奖励与升级所需对局数估算。">
+  <link rel="canonical" href="https://example.com/tools/coop-xp.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="合作模式经验计算器">
+  <meta property="og:description" content="按公开官方规则估算合作模式经验。">
+  <meta property="og:url" content="https://example.com/tools/coop-xp.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "星际争霸2合作模式经验计算器",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web",
+      "url": "https://example.com/tools/coop-xp.html"
+    }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo">合作模式经验计算器</h1>
+      <nav aria-label="主导航">
+        <ul class="nav-list">
+          <li><a href="../index.html">首页</a></li>
+          <li><a aria-current="page" href="./coop-xp.html">经验计算器</a></li>
+          <li><a href="./replay-viewer.html">Replay查看</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="../index.html">首页</a> / <span>经验计算器</span>
+    </nav>
+    <section>
+      <h2>计算模式</h2>
+      <div class="form-grid">
+        <button id="mode-commander-btn" type="button" aria-pressed="true">指挥官经验计算</button>
+        <button id="mode-mastery-btn" type="button" aria-pressed="false">精通经验计算</button>
+      </div>
+    </section>
+    <section>
+      <h2>输入参数</h2>
+      <form id="xp-form" class="form-grid">
+        <label>
+          难度
+          <select name="difficulty" required>
+            <option value="casual">休闲</option>
+            <option value="normal">普通</option>
+            <option value="hard">困难</option>
+            <option value="brutal">残酷</option>
+            <option value="brutal1">残酷+1</option>
+            <option value="brutal2">残酷+2</option>
+            <option value="brutal3">残酷+3</option>
+            <option value="brutal4">残酷+4</option>
+            <option value="brutal5">残酷+5</option>
+            <option value="brutal6">残酷+6</option>
+          </select>
+        </label>
+        <label class="checkbox">
+          <input name="randomMapBonus" type="checkbox">
+          随机地图（+25%）
+        </label>
+        <label class="checkbox">
+          <input name="firstWinBonus" type="checkbox">
+          每日首胜（+10000）
+        </label>
+      </form>
+    </section>
+
+    <section aria-live="polite">
+      <h2>计算结果</h2>
+      <div id="xp-result" class="card"></div>
+    </section>
+
+    <section data-mode-section="commander">
+      <h2>每周突变奖励</h2>
+      <form id="mutation-form" class="form-grid">
+        <label>
+          突变难度
+          <select name="mutationDifficulty" required>
+            <option value="casual">休闲</option>
+            <option value="normal">普通</option>
+            <option value="hard">困难</option>
+            <option value="savage">野蛮</option>
+          </select>
+        </label>
+      </form>
+      <div id="mutation-result" class="card" aria-live="polite"></div>
+    </section>
+
+    <section data-mode-section="commander">
+      <h2>指挥官升级对局数估算</h2>
+      <p>根据“起始等级+当前经验”到“目标等级+目标经验”，结合当前每局经验，估算还需对局数。</p>
+      <form id="leveling-form" class="form-grid">
+        <label>
+          起始等级
+          <select name="startLevel" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+          </select>
+        </label>
+        <label>
+          起始等级当前经验
+          <input name="startLevelXp" type="number" min="0" step="1" value="0" required>
+        </label>
+        <label>
+          目标等级
+          <select name="targetLevel" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15" selected>15</option>
+          </select>
+        </label>
+        <label>
+          目标等级当前经验
+          <input name="targetLevelXp" type="number" min="0" step="1" value="0" required>
+        </label>
+      </form>
+      <div id="leveling-result" class="card" aria-live="polite"></div>
+    </section>
+
+    <section data-mode-section="mastery" hidden>
+      <h2>精通/晋升等级对局数估算</h2>
+      <p>精通0-90按固定经验表计算；90级及以上按每级200000经验计算（晋升）。</p>
+      <form id="mastery-form" class="form-grid">
+        <label>
+          起始精通/晋升等级
+          <input name="startMasteryLevel" type="number" min="0" step="1" value="0" required>
+        </label>
+        <label>
+          起始等级当前经验
+          <input name="startMasteryXp" type="number" min="0" step="1" value="0" required>
+        </label>
+        <label>
+          目标精通/晋升等级
+          <input name="targetMasteryLevel" type="number" min="0" step="1" value="90" required>
+        </label>
+        <label>
+          目标等级当前经验
+          <input name="targetMasteryXp" type="number" min="0" step="1" value="0" required>
+        </label>
+      </form>
+      <div id="mastery-result" class="card" aria-live="polite"></div>
+    </section>
+
+    <section>
+      <h2>公式说明</h2>
+      <p>每局游戏经验 = (基础经验 + 奖励目标经验) × (1 + 难度加成 + 随机加成) + 首胜经验</p>
+      <p>基础经验：20000（固定） | 奖励目标经验：2000（固定） | 随机加成：随机地图时25% | 首胜经验：10000</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 星际争霸2工具站</p>
+    </div>
+  </footer>
+  <script defer src="../assets/js/coop-xp.js"></script>
+</body>
+</html>
