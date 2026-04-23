@@ -1,15 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T1FL3L29V3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-T1FL3L29V3');
-  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>精通0-90级经验列表 - 星际争霸2工具站</title>
@@ -156,6 +147,41 @@
       <p>© 2026 星际争霸2工具站</p>
     </div>
   </footer>
+  <script>
+    (function () {
+      let loaded = false;
+      function loadGa() {
+        if (loaded) return;
+        loaded = true;
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=G-T1FL3L29V3";
+        document.head.appendChild(script);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function gtag(){window.dataLayer.push(arguments);};
+        window.gtag("js", new Date());
+        window.gtag("config", "G-T1FL3L29V3");
+        (function notifyAnalyticsLoaded(retry) {
+          if (window.SC2Analytics && typeof window.SC2Analytics.trackPageView === "function") {
+            window.SC2Analytics.trackPageView();
+            return;
+          }
+          if (retry > 0) {
+            window.setTimeout(function () {
+              notifyAnalyticsLoaded(retry - 1);
+            }, 300);
+          }
+        })(5);
+      }
+      window.addEventListener("pointerdown", loadGa, { once: true, passive: true });
+      window.addEventListener("keydown", loadGa, { once: true, passive: true });
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(loadGa, { timeout: 2000 });
+      } else {
+        window.setTimeout(loadGa, 1500);
+      }
+    })();
+  </script>
   <script defer src="../assets/js/analytics-config.js"></script>
   <script defer src="../assets/js/analytics.js"></script>
   <script>

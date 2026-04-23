@@ -25,6 +25,27 @@
     return matched[1];
   }
 
+  function getTrackingPolicy() {
+    const toolName = detectToolName(window.location.pathname);
+    const tablePages = new Set([
+      "commander-xp-table",
+      "mastery-xp-table",
+      "mutation-reward-table"
+    ]);
+    if (tablePages.has(toolName)) {
+      return {
+        enableClick: autoTrack.click !== false,
+        enableChange: false,
+        enableSubmit: false
+      };
+    }
+    return {
+      enableClick: autoTrack.click !== false,
+      enableChange: autoTrack.change !== false,
+      enableSubmit: autoTrack.submit !== false
+    };
+  }
+
   function getEventContext() {
     return {
       site_name: String(config.siteName || "SC2Tools"),
@@ -157,13 +178,14 @@
   }
 
   function initAutoTracking() {
-    if (autoTrack.click !== false) {
+    const policy = getTrackingPolicy();
+    if (policy.enableClick) {
       document.addEventListener("click", trackAutoClick, true);
     }
-    if (autoTrack.change !== false) {
+    if (policy.enableChange) {
       document.addEventListener("change", trackAutoChange, true);
     }
-    if (autoTrack.submit !== false) {
+    if (policy.enableSubmit) {
       document.addEventListener("submit", trackAutoSubmit, true);
     }
   }
