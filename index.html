@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T1FL3L29V3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T1FL3L29V3');
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>星际争霸2工具站 - 经验计算器与Replay查看</title>
@@ -55,12 +64,11 @@
   <a class="skip-link" href="#main-content">跳到主要内容</a>
   <header class="site-header">
     <div class="container">
-      <h1 class="logo">星际争霸2工具站</h1>
+      <h1 class="logo"><a href="./">星际争霸2工具站</a></h1>
       <nav aria-label="主导航">
         <ul class="nav-list">
-          <li><a href="./">首页</a></li>
-          <li><a href="tools/single-xp.html">单局游戏经验计算</a></li>
-          <li><a href="tools/coop-xp.html">合作模式经验计算器</a></li>
+          <li><a href="tools/single-xp.html">单局经验计算器</a></li>
+          <li><a href="tools/coop-xp.html">合作练级日历</a></li>
           <li><a href="tools/replay-viewer.html">Replay在线查看</a></li>
         </ul>
       </nav>
@@ -96,6 +104,10 @@
           <h3><a href="tools/mastery-xp-table.html">精通0-90级经验列表</a></h3>
           <p>查看精通等级经验曲线，并附90级后晋升每级固定经验说明。</p>
         </article>
+        <article class="card">
+          <h3><a href="tools/mutation-reward-table.html">每周突变奖励经验列表</a></h3>
+          <p>查看休闲到残酷各档突变奖励经验与累积奖励。</p>
+        </article>
       </div>
     </section>
 
@@ -117,5 +129,7 @@
       <p>© 2026 星际争霸2工具站</p>
     </div>
   </footer>
+  <script defer src="assets/js/analytics-config.js"></script>
+  <script defer src="assets/js/analytics.js"></script>
 </body>
 </html>

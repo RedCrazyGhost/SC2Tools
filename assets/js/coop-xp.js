@@ -1,6 +1,13 @@
 (function () {
   "use strict";
 
+  function trackAnalyticsEvent(eventName, params) {
+    if (!window.SC2Analytics || typeof window.SC2Analytics.trackEvent !== "function") {
+      return;
+    }
+    window.SC2Analytics.trackEvent(eventName, params);
+  }
+
   const XP_CONFIG = {
     baseXp: 20000,
     objectiveXp: 2000,
@@ -291,7 +298,7 @@
         `总经验：${formatXp(task.totalXp || 0)}`,
         `预计时长：${formatDuration(task.estimatedMinutes || 0)}`
       ].join("\n");
-      const uid = `${task.id || `task_${Date.now()}`}@sc2tool.local`;
+      const uid = `${task.id || `task_${Date.now()}`}@sc2tools.local`;
       return [
         "BEGIN:VEVENT",
         `UID:${escapeIcsText(uid)}`,
@@ -306,7 +313,7 @@
     return [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//SC2Tool//CoopSchedule//CN",
+      "PRODID:-//SC2Tools//CoopSchedule//CN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       ...events,
@@ -541,6 +548,16 @@
     })
   };
 
+  let coopScheduleDebounceTimer = null;
+  const COOP_SCHEDULE_DEBOUNCE_MS = 120;
+
+  function cancelCoopScheduleDebounce() {
+    if (coopScheduleDebounceTimer) {
+      clearTimeout(coopScheduleDebounceTimer);
+      coopScheduleDebounceTimer = null;
+    }
+  }
+
   function getCommanderMaxTotalXp() {
     return XP_CONFIG.commanderLevels.cumulativeAtLevel[15] || 0;
   }
@@ -767,7 +784,7 @@
       applyMasteryInputsFromRange();
     }
     dualRangeState.suppressRefresh = false;
-    refreshAll();
+    onLevelingMasteryInput();
   }
 
   function readInput() {
@@ -1564,6 +1581,7 @@
       window.alert("请输入有效的目标经验（xp，且大于0）。");
       return;
     }
+    cancelCoopScheduleDebounce();
     scheduleState.generated = true;
     scheduleState.targetSource = "auto";
     scheduleState.targetMode = currentMode;
@@ -1589,6 +1607,18 @@
     scheduleState.targetGames = scheduleState.tasks.reduce(function (sum, task) { return sum + task.games; }, 0);
     scheduleState.selectedTaskId = null;
     scheduleState.viewDate = clampViewDate(autoPlanInput.startDate);
+    trackAnalyticsEvent("schedule_generated", {
+      target_xp: scheduleState.targetXp,
+      total_tasks: scheduleState.tasks.length,
+      total_games: scheduleState.targetGames,
+      difficulty: autoPlanInput.difficulty,
+      is_random_map: autoPlanInput.randomMapBonus,
+      has_challenge_mutation: autoPlanInput.challengeMutation,
+      mutation_difficulty: autoPlanInput.mutationDifficulty,
+      daily_normal_games: autoPlanInput.dailyNormalGames,
+      event_category: "schedule",
+      event_label: "auto_plan"
+    });
     closeAutoPlanModal();
     renderScheduleSummary(context.targetData);
     renderScheduleList();
@@ -1605,6 +1635,7 @@
       window.alert("局数必须大于0。");
       return;
     }
+    let analyticsAction = "task_created";
     if (scheduleState.editorMode === "edit" && scheduleState.editorTaskId) {
       const target = scheduleState.tasks.find(function (task) { return task.id === scheduleState.editorTaskId; });
       if (target) {
@@ -1615,6 +1646,7 @@
         target.randomMapBonus = value.randomMapBonus;
         scheduleState.selectedTaskId = target.id;
       }
+      analyticsAction = "task_updated";
     } else {
       const task = createTask(
         dateToInput(value.date),
@@ -1632,11 +1664,23 @@
       renderScheduleSummary(context.targetData);
     }
     scheduleState.viewDate = clampViewDate(value.date);
+    trackAnalyticsEvent(analyticsAction, {
+      task_type: value.taskType,
+      difficulty: value.difficulty,
+      games: Math.floor(value.games),
+      date: dateToInput(value.date),
+      is_random_map: value.randomMapBonus,
+      event_category: "schedule_task",
+      event_label: analyticsAction
+    });
     closeEditorModal();
     renderScheduleList();
   }
 
   function removeTaskById(taskId) {
+    const removedTask = scheduleState.tasks.find(function (task) {
+      return task.id === taskId;
+    }) || null;
     const ratio = DEFAULT_STAGE_RATIO;
     scheduleState.tasks = scheduleState.tasks.filter(function (task) {
       return task.id !== taskId;
@@ -1648,6 +1692,17 @@
     const context = gatherCurrentContext();
     if (context) {
       renderScheduleSummary(context.targetData);
+    }
+    if (removedTask) {
+      trackAnalyticsEvent("task_deleted", {
+        task_type: removedTask.taskType,
+        difficulty: removedTask.difficulty,
+        games: removedTask.games,
+        date: removedTask.date,
+        is_random_map: removedTask.randomMapBonus,
+        event_category: "schedule_task",
+        event_label: "delete"
+      });
     }
     renderScheduleList();
   }
@@ -1667,7 +1722,8 @@
       window.alert("每日局数必须大于0。");
       return;
     }
-    for (let i = 0; i < Math.floor(value.days); i += 1) {
+    const createdDays = Math.floor(value.days);
+    for (let i = 0; i < createdDays; i += 1) {
       const date = dateToInput(addDays(value.startDate, i));
       scheduleState.tasks.push(
         createTask(date, Math.floor(value.gamesPerDay), "normal", value.difficulty, value.randomMapBonus)
@@ -1679,6 +1735,15 @@
     if (context) {
       renderScheduleSummary(context.targetData);
     }
+    trackAnalyticsEvent("task_created", {
+      create_mode: "bulk",
+      days: createdDays,
+      games_per_day: Math.floor(value.gamesPerDay),
+      difficulty: value.difficulty,
+      is_random_map: value.randomMapBonus,
+      event_category: "schedule_task",
+      event_label: "bulk_create"
+    });
     closeBulkModal();
     renderScheduleList();
   }
@@ -1689,29 +1754,58 @@
     closeEditorModal();
   }
 
-  function refreshAll() {
+  function refreshXpPanels() {
     if (dualRangeState.suppressRefresh) {
-      return;
+      return null;
     }
     const context = gatherCurrentContext();
-    if (!context) return;
+    if (!context) return null;
     syncRangesFromInputs();
     if (currentMode === "mastery") {
       renderMasteryResult(masteryResultEl, context.masteryResult, context.calc.total);
     } else {
       renderLevelingResult(levelingResultEl, context.levelingResult, context.calc.total);
     }
-    if (scheduleState.generated) {
-      syncScheduleMutationRewardSetting(
-        !!scheduleState.autoPlanConfig.challengeMutation,
-        scheduleState.autoPlanConfig.mutationDifficulty || "savage"
-      );
-      scheduleState.tasks = recalculateTaskDetails(scheduleState.tasks, DEFAULT_STAGE_RATIO, scheduleState.mutationRewardPerWeek);
-      renderScheduleSummary(context.targetData);
-      renderScheduleList();
-    } else {
-      renderScheduleSummary(context.targetData);
-      renderScheduleList();
+    return context;
+  }
+
+  function refreshScheduleViews(context) {
+    if (!context || !scheduleState.generated) return;
+    syncScheduleMutationRewardSetting(
+      !!scheduleState.autoPlanConfig.challengeMutation,
+      scheduleState.autoPlanConfig.mutationDifficulty || "savage"
+    );
+    scheduleState.tasks = recalculateTaskDetails(scheduleState.tasks, DEFAULT_STAGE_RATIO, scheduleState.mutationRewardPerWeek);
+    renderScheduleSummary(context.targetData);
+    renderScheduleList();
+  }
+
+  function debouncedRefreshScheduleViews() {
+    cancelCoopScheduleDebounce();
+    coopScheduleDebounceTimer = setTimeout(function () {
+      coopScheduleDebounceTimer = null;
+      const ctx = gatherCurrentContext();
+      if (ctx && scheduleState.generated) {
+        refreshScheduleViews(ctx);
+      }
+    }, COOP_SCHEDULE_DEBOUNCE_MS);
+  }
+
+  function refreshAllImmediate() {
+    if (dualRangeState.suppressRefresh) {
+      return;
+    }
+    cancelCoopScheduleDebounce();
+    const context = refreshXpPanels();
+    if (context && scheduleState.generated) {
+      refreshScheduleViews(context);
+    }
+  }
+
+  function onLevelingMasteryInput() {
+    const context = refreshXpPanels();
+    if (context && scheduleState.generated) {
+      debouncedRefreshScheduleViews();
     }
   }
 
@@ -1737,7 +1831,10 @@
     scheduleState.targetGames = 0;
     scheduleState.targetSource = "none";
     scheduleState.selectedTaskId = null;
-    refreshAll();
+    cancelCoopScheduleDebounce();
+    refreshXpPanels();
+    renderScheduleSummary(null);
+    renderScheduleList();
   }
 
   function shiftViewMonth(delta) {
@@ -1750,10 +1847,10 @@
     renderScheduleList();
   }
 
-  levelingForm.addEventListener("input", refreshAll);
-  levelingForm.addEventListener("change", refreshAll);
-  masteryForm.addEventListener("input", refreshAll);
-  masteryForm.addEventListener("change", refreshAll);
+  levelingForm.addEventListener("input", onLevelingMasteryInput);
+  levelingForm.addEventListener("change", refreshAllImmediate);
+  masteryForm.addEventListener("input", onLevelingMasteryInput);
+  masteryForm.addEventListener("change", refreshAllImmediate);
   levelingResultEl.addEventListener("click", function (event) {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
@@ -1762,7 +1859,7 @@
     const context = gatherCurrentContext();
     if (!context) return;
     syncTargetXpFromContext(context);
-    refreshAll();
+    refreshAllImmediate();
   });
   masteryResultEl.addEventListener("click", function (event) {
     const target = event.target;
@@ -1772,11 +1869,20 @@
     const context = gatherCurrentContext();
     if (!context) return;
     syncTargetXpFromContext(context);
-    refreshAll();
+    refreshAllImmediate();
   });
   scheduleForm.addEventListener("input", function () {
     if (scheduleState.generated) {
-      refreshAll();
+      debouncedRefreshScheduleViews();
+    }
+  });
+  scheduleForm.addEventListener("change", function () {
+    if (scheduleState.generated) {
+      cancelCoopScheduleDebounce();
+      const ctx = gatherCurrentContext();
+      if (ctx) {
+        refreshScheduleViews(ctx);
+      }
     }
   });
   autoPlanBtn.addEventListener("click", function () {
@@ -1811,6 +1917,14 @@
       : dateToInput(new Date()).replace(/-/g, "");
     const filename = `coop-plan-${suffix}.ics`;
     downloadIcs(filename, content);
+    trackAnalyticsEvent("ics_export", {
+      export_scope: options.scope,
+      start_time: options.startTime,
+      exported_tasks: exportingTasks.length,
+      filename,
+      event_category: "schedule",
+      event_label: "ics_export"
+    });
     closeExportModal();
   });
   calendarExportCancelBtn.addEventListener("click", function () {
@@ -1915,11 +2029,21 @@
   });
   modeCommanderBtn.addEventListener("click", function () {
     applyMode("commander");
-    refreshAll();
+    refreshAllImmediate();
+    trackAnalyticsEvent("mode_switch", {
+      mode: "commander",
+      event_category: "calculator_mode",
+      event_label: "commander"
+    });
   });
   modeMasteryBtn.addEventListener("click", function () {
     applyMode("mastery");
-    refreshAll();
+    refreshAllImmediate();
+    trackAnalyticsEvent("mode_switch", {
+      mode: "mastery",
+      event_category: "calculator_mode",
+      event_label: "mastery"
+    });
   });
   dualRangeState.commander.startInput.addEventListener("input", function () {
     handleRangeInput("commander", "start");
@@ -1942,5 +2066,7 @@
   scheduleState.viewDate = clampViewDate(new Date());
   applyMode("commander");
   syncRangesFromInputs();
-  refreshAll();
+  refreshXpPanels();
+  renderScheduleSummary(null);
+  renderScheduleList();
 })();

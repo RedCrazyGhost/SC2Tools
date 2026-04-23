@@ -5,22 +5,36 @@
   --muted: #94a3b8;
   --accent: #38bdf8;
   --border: #1f2937;
+  --site-footer-height: 3.5rem;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
+  min-height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
 }
 
-a {
+a,
+a:hover,
+a:focus-visible,
+a:visited,
+a:active {
   color: var(--accent);
+  text-decoration: none;
 }
 
 .container {
@@ -28,21 +42,59 @@ a {
   margin: 0 auto;
 }
 
-.site-header,
-.site-footer {
+.site-header {
+  flex-shrink: 0;
   border-bottom: 1px solid var(--border);
   padding: 0.8rem 0;
 }
 
+main.container,
+main#main-content.container {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: 1.25rem;
+}
+
+.site-header .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.site-header .nav-list {
+  margin-top: 0;
+}
+
 .site-footer {
+  flex-shrink: 0;
+  height: var(--site-footer-height);
+  min-height: var(--site-footer-height);
+  margin-top: 0;
+  padding: 0;
   border-top: 1px solid var(--border);
   border-bottom: 0;
-  margin-top: 2.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.site-footer p {
+  margin: 0;
 }
 
 .logo {
   margin: 0;
   font-size: 1.3rem;
+}
+
+.logo a {
+  color: inherit;
+}
+
+.logo a:hover,
+.logo a:focus-visible {
+  color: var(--accent);
 }
 
 .nav-list {
@@ -512,6 +564,17 @@ main.container h3 {
   position: fixed;
   inset: 0;
   z-index: 40;
+}
+
+body > .calendar-editor-modal {
+  flex: 0 0 0;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
 }
 
 .calendar-editor-backdrop {

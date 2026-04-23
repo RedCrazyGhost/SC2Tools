@@ -1,6 +1,13 @@
 (function () {
   "use strict";
 
+  function trackAnalyticsEvent(eventName, params) {
+    if (!window.SC2Analytics || typeof window.SC2Analytics.trackEvent !== "function") {
+      return;
+    }
+    window.SC2Analytics.trackEvent(eventName, params);
+  }
+
   const XP_CONFIG = {
     baseXp: 20000,
     objectiveXp: 2000,
@@ -123,7 +130,42 @@
     renderResult(resultEl, result);
   }
 
-  form.addEventListener("input", refresh);
-  form.addEventListener("change", refresh);
+  let refreshDebounceTimer = null;
+  const INPUT_DEBOUNCE_MS = 100;
+
+  function cancelRefreshDebounce() {
+    if (refreshDebounceTimer) {
+      clearTimeout(refreshDebounceTimer);
+      refreshDebounceTimer = null;
+    }
+  }
+
+  function refreshDebounced() {
+    cancelRefreshDebounce();
+    refreshDebounceTimer = setTimeout(function () {
+      refreshDebounceTimer = null;
+      refresh();
+    }, INPUT_DEBOUNCE_MS);
+  }
+
+  form.addEventListener("input", refreshDebounced);
+  form.addEventListener("change", function () {
+    cancelRefreshDebounce();
+    refresh();
+    const input = readInput();
+    const mutationDifficulty = mapDifficultyToMutationDifficulty(input.difficulty);
+    const mutationReward = getMutationAccumulatedReward(mutationDifficulty);
+    const result = calculateXp(input, mutationReward);
+    trackAnalyticsEvent("single_xp_calculated", {
+      task_type: input.taskType,
+      difficulty: input.difficulty,
+      is_random_map: input.randomMapBonus,
+      has_first_win_bonus: input.firstWinBonus,
+      mutation_difficulty: mutationDifficulty,
+      total_xp: result.total,
+      event_category: "calculation",
+      event_label: "single_xp"
+    });
+  });
   refresh();
 })();

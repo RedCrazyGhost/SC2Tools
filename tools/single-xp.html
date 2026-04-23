@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T1FL3L29V3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T1FL3L29V3');
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>单局游戏经验计算 - 星际争霸2工具站</title>
@@ -16,13 +25,12 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <h1 class="logo">单局游戏经验计算</h1>
+      <h1 class="logo"><a href="../index.html">星际争霸2工具站</a></h1>
       <nav aria-label="主导航">
         <ul class="nav-list">
-          <li><a href="../index.html">首页</a></li>
-          <li><a href="./single-xp.html" aria-current="page">单局经验</a></li>
-          <li><a href="./coop-xp.html">经验计算器</a></li>
-          <li><a href="./replay-viewer.html">Replay查看</a></li>
+          <li><a href="./single-xp.html" aria-current="page">单局经验计算器</a></li>
+          <li><a href="./coop-xp.html">合作练级日历</a></li>
+          <li><a href="./replay-viewer.html">Replay在线查看</a></li>
         </ul>
       </nav>
     </div>
@@ -82,7 +90,7 @@
       <ul>
         <li><a href="./commander-xp-table.html">指挥官1-15级经验列表</a></li>
         <li><a href="./mastery-xp-table.html">精通0-90级经验列表</a></li>
-        <li><a href="./mutation-reward-table.html">每周突变奖励说明</a></li>
+        <li><a href="./mutation-reward-table.html">每周突变奖励经验列表</a></li>
       </ul>
     </section>
   </main>
@@ -92,6 +100,8 @@
       <p>© 2026 星际争霸2工具站</p>
     </div>
   </footer>
+  <script defer src="../assets/js/analytics-config.js"></script>
+  <script defer src="../assets/js/analytics.js"></script>
   <script defer src="../assets/js/single-xp.js"></script>
 </body>
 </html>

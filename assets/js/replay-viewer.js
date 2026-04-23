@@ -1,6 +1,13 @@
 (function () {
   "use strict";
 
+  function trackAnalyticsEvent(eventName, params) {
+    if (!window.SC2Analytics || typeof window.SC2Analytics.trackEvent !== "function") {
+      return;
+    }
+    window.SC2Analytics.trackEvent(eventName, params);
+  }
+
   const input = document.getElementById("replay-file-input");
   const statusEl = document.getElementById("parse-status");
   const metaEl = document.getElementById("replay-meta");
@@ -41,14 +48,36 @@
     if (!file) {
       return;
     }
+    trackAnalyticsEvent("replay_parse_start", {
+      file_name: file.name || "",
+      file_size_kb: Math.round((Number(file.size) || 0) / 1024),
+      event_category: "replay",
+      event_label: "parse_start"
+    });
     statusEl.textContent = "解析中...";
     try {
       const meta = await window.SC2ReplayParser.parseReplay(file);
       renderMeta(meta);
       statusEl.textContent = "解析完成";
+      trackAnalyticsEvent("replay_parse_success", {
+        file_name: meta.fileName || file.name || "",
+        file_size_kb: meta.fileSizeKb || Math.round((Number(file.size) || 0) / 1024),
+        map_name: meta.mapName || "",
+        game_mode: meta.gameMode || "",
+        build_version: meta.buildVersion || "",
+        result: meta.result || "",
+        event_category: "replay",
+        event_label: "parse_success"
+      });
     } catch (error) {
       renderError(error instanceof Error ? error.message : "解析失败，请重试其他Replay文件。");
       statusEl.textContent = "解析失败";
+      trackAnalyticsEvent("replay_parse_error", {
+        file_name: file.name || "",
+        error_message: error instanceof Error ? error.message : "unknown_error",
+        event_category: "replay",
+        event_label: "parse_error"
+      });
     }
   });
 })();
