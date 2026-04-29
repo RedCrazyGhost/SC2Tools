@@ -119,6 +119,25 @@ main#main-content.container {
   gap: 0.4rem;
 }
 
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--text);
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color: var(--accent);
+}
+
+.github-link svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 .lang-switcher select {
   margin-top: 0;
   padding: 0.25rem 0.45rem;
