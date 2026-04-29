@@ -308,15 +308,23 @@
 .task-chip-content {
   display: grid;
   gap: 0.08rem;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .task-chip-title {
   font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .task-chip-xp {
   color: #cbd5e1;
   font-size: 0.68rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .task-chip.selected {

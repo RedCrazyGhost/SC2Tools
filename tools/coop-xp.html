@@ -12,12 +12,12 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>合作模式经验计算器 - 星际争霸2工具站</title>
-  <meta name="description" content="星际争霸2合作模式经验计算器：支持指挥官/精通等级经验计算、目标经验同步、合作任务计划日历自动规划与突变奖励结算。">
+  <title data-i18n="head.coop.title">合作模式经验计算器 - 星际争霸2工具站</title>
+  <meta name="description" content="星际争霸2合作模式经验计算器：支持指挥官/精通等级经验计算、目标经验同步、合作任务计划日历自动规划与突变奖励结算。" data-i18n-content="head.coop.description">
   <link rel="canonical" href="https://example.com/tools/coop-xp.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="合作模式经验计算器">
-  <meta property="og:description" content="按公开官方规则估算合作模式经验。">
+  <meta property="og:title" content="合作模式经验计算器" data-i18n-content="head.coop.ogTitle">
+  <meta property="og:description" content="按公开官方规则估算合作模式经验。" data-i18n-content="head.coop.ogDescription">
   <meta property="og:url" content="https://example.com/tools/coop-xp.html">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="../assets/css/main.css">
@@ -36,35 +36,43 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <h1 class="logo"><a href="../index.html">星际争霸2工具站</a></h1>
-      <nav aria-label="主导航">
-        <ul class="nav-list">
-          <li><a href="./single-xp.html">单局经验计算器</a></li>
-          <li><a aria-current="page" href="./coop-xp.html">合作练级日历</a></li>
-          <li><a href="./replay-viewer.html">Replay在线查看</a></li>
-        </ul>
-      </nav>
+      <h1 class="logo"><a href="../index.html" data-i18n="site.name">星际争霸2工具站</a></h1>
+      <div class="header-actions">
+        <nav aria-label="主导航" data-i18n-aria-label="aria.mainNav">
+          <ul class="nav-list">
+            <li><a href="./single-xp.html" data-i18n="nav.single">单局经验计算器</a></li>
+            <li><a aria-current="page" href="./coop-xp.html" data-i18n="nav.coop">合作练级日历</a></li>
+          </ul>
+        </nav>
+        <div class="lang-switcher" aria-label="language switcher" data-i18n-aria-label="aria.languageSwitcher">
+          <label for="lang-select-coop" data-i18n="lang.switcher.label">语言</label>
+          <select id="lang-select-coop" data-lang-select>
+            <option value="zh" data-i18n="lang.zh">中文</option>
+            <option value="en" data-i18n="lang.en">EN</option>
+          </select>
+        </div>
+      </div>
     </div>
   </header>
 
   <main class="container">
-    <nav class="breadcrumb" aria-label="面包屑">
-      <a href="../index.html">首页</a> / <span>经验计算器</span>
+    <nav class="breadcrumb" aria-label="面包屑" data-i18n-aria-label="aria.breadcrumb">
+      <a href="../index.html" data-i18n="common.home">首页</a> / <span data-i18n="common.calculator">经验计算器</span>
     </nav>
     <section>
-      <h2>合作任务计划日历</h2>
-      <h3>计算模式</h3>
+      <h2 data-i18n="coop.title">合作任务计划日历</h2>
+      <h3 data-i18n="coop.mode.title">计算模式</h3>
       <div class="form-grid">
-        <button id="mode-commander-btn" type="button" aria-pressed="true">指挥官经验计算</button>
-        <button id="mode-mastery-btn" type="button" aria-pressed="false">精通经验计算</button>
+        <button id="mode-commander-btn" type="button" aria-pressed="true" data-i18n="coop.mode.commander">指挥官经验计算</button>
+        <button id="mode-mastery-btn" type="button" aria-pressed="false" data-i18n="coop.mode.mastery">精通经验计算</button>
       </div>
 
       <div data-mode-section="commander">
-        <h3>指挥官升级经验计算</h3>
-        <p>根据“起始等级+当前经验”到“目标等级+目标经验”，计算需要获得经验，可手动同步到计划日历目标经验。</p>
+        <h3 data-i18n="coop.commander.title">指挥官升级经验计算</h3>
+        <p data-i18n="coop.commander.desc">根据“起始等级+当前经验”到“目标等级+目标经验”，计算需要获得经验，可手动同步到计划日历目标经验。</p>
         <form id="leveling-form" class="form-grid">
           <label>
-            起始等级
+            <span data-i18n="coop.field.startLevel">起始等级</span>
             <select name="startLevel" required>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -84,11 +92,11 @@
             </select>
           </label>
           <label>
-            起始等级当前经验
+            <span data-i18n="coop.field.startLevelXp">起始等级当前经验</span>
             <input name="startLevelXp" type="number" min="0" step="1" value="0" required>
           </label>
           <label>
-            目标等级
+            <span data-i18n="coop.field.targetLevel">目标等级</span>
             <select name="targetLevel" required>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -108,18 +116,18 @@
             </select>
           </label>
           <label>
-            目标等级当前经验
+            <span data-i18n="coop.field.targetLevelXp">目标等级当前经验</span>
             <input name="targetLevelXp" type="number" min="0" step="1" value="0" required>
           </label>
           <div class="xp-range-field" data-range-mode="commander">
-            <p class="xp-range-label">等级经验区间（拖拽两端）</p>
+            <p class="xp-range-label" data-i18n="coop.field.xpRange">等级经验区间（拖拽两端）</p>
             <div class="xp-dual-range" data-dual-range="commander">
               <div class="xp-dual-track">
                 <div class="xp-dual-ticks" aria-hidden="true"></div>
                 <div class="xp-dual-selected"></div>
               </div>
-              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="1045000" step="1" value="0" aria-label="起始总经验">
-              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="1045000" step="1" value="1045000" aria-label="目标总经验">
+              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="1045000" step="1" value="0" aria-label="起始总经验" data-i18n-aria-label="coop.aria.startTotalXp">
+              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="1045000" step="1" value="1045000" aria-label="目标总经验" data-i18n-aria-label="coop.aria.targetTotalXp">
             </div>
           </div>
         </form>
@@ -127,92 +135,92 @@
       </div>
 
       <div data-mode-section="mastery" hidden>
-        <h3>精通/晋升等级经验计算</h3>
-        <p>精通0-90按固定经验表计算；90-1000级按每级200000经验计算（晋升）。</p>
+        <h3 data-i18n="coop.mastery.title">精通/晋升等级经验计算</h3>
+        <p data-i18n="coop.mastery.desc">精通0-90按固定经验表计算；90-1000级按每级200000经验计算（晋升）。</p>
         <form id="mastery-form" class="form-grid">
           <label>
-            起始精通/晋升等级
+            <span data-i18n="coop.field.startMasteryLevel">起始精通/晋升等级</span>
             <input name="startMasteryLevel" type="number" min="0" max="1000" step="1" value="0" required>
           </label>
           <label>
-            起始等级当前经验
+            <span data-i18n="coop.field.startLevelXp">起始等级当前经验</span>
             <input name="startMasteryXp" type="number" min="0" step="1" value="0" required>
           </label>
           <label>
-            目标精通/晋升等级
+            <span data-i18n="coop.field.targetMasteryLevel">目标精通/晋升等级</span>
             <input name="targetMasteryLevel" type="number" min="0" max="1000" step="1" value="90" required>
           </label>
           <label>
-            目标等级当前经验
+            <span data-i18n="coop.field.targetLevelXp">目标等级当前经验</span>
             <input name="targetMasteryXp" type="number" min="0" step="1" value="0" required>
           </label>
           <div class="xp-range-field" data-range-mode="mastery">
-            <p class="xp-range-label">等级经验区间（拖拽两端）</p>
+            <p class="xp-range-label" data-i18n="coop.field.xpRange">等级经验区间（拖拽两端）</p>
             <div class="xp-dual-range" data-dual-range="mastery">
               <div class="xp-dual-track">
                 <div class="xp-dual-ticks" aria-hidden="true"></div>
                 <div class="xp-dual-selected"></div>
               </div>
-              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="15919000" step="1" value="0" aria-label="起始总经验">
-              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="15919000" step="1" value="15919000" aria-label="目标总经验">
+              <input class="xp-dual-input xp-dual-input-start" type="range" min="0" max="15919000" step="1" value="0" aria-label="起始总经验" data-i18n-aria-label="coop.aria.startTotalXp">
+              <input class="xp-dual-input xp-dual-input-end" type="range" min="0" max="15919000" step="1" value="15919000" aria-label="目标总经验" data-i18n-aria-label="coop.aria.targetTotalXp">
             </div>
           </div>
         </form>
         <div id="mastery-result" class="card" aria-live="polite"></div>
       </div>
 
-      <h3>计划日历</h3>
+      <h3 data-i18n="coop.schedule.title">计划日历</h3>
       <form id="schedule-form" class="form-grid">
         <label>
-          目标经验（xp）
+          <span data-i18n="coop.field.targetXp">目标经验（xp）</span>
           <input name="targetXp" type="number" min="1" step="1" value="100000" required>
         </label>
       </form>
       <div id="schedule-summary" class="card" aria-live="polite">
-        <p>填写参数并点击“自动规划”。</p>
+        <p data-i18n="coop.schedule.placeholder">填写参数并点击“自动规划”。</p>
       </div>
       <div class="calendar-list-header">
         <div class="calendar-toolbar-nav">
-          <button id="calendar-prev-month-btn" class="calendar-icon-btn" type="button" title="上月" aria-label="上月">
+          <button id="calendar-prev-month-btn" class="calendar-icon-btn" type="button" title="上月" data-i18n-title="coop.toolbar.prev" data-i18n-aria-label="coop.toolbar.prev" aria-label="上月">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/></svg>
           </button>
-          <button id="calendar-next-month-btn" class="calendar-icon-btn" type="button" title="下月" aria-label="下月">
+          <button id="calendar-next-month-btn" class="calendar-icon-btn" type="button" title="下月" data-i18n-title="coop.toolbar.next" data-i18n-aria-label="coop.toolbar.next" aria-label="下月">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.3 17.7a1 1 0 0 1 0-1.4L13.59 12l-4.3-4.3a1 1 0 0 1 1.42-1.4l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.41 0Z"/></svg>
           </button>
-          <button id="calendar-today-btn" class="calendar-icon-btn" type="button" title="返回今天" aria-label="返回今天">
+          <button id="calendar-today-btn" class="calendar-icon-btn" type="button" title="返回今天" data-i18n-title="coop.toolbar.today" data-i18n-aria-label="coop.toolbar.today" aria-label="返回今天">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2.8 2.75 5.58 6.16.9-4.45 4.34 1.05 6.14L12 16.9 6.49 19.76l1.06-6.14L3.1 9.28l6.16-.9L12 2.8Z"/></svg>
           </button>
-          <button id="calendar-auto-plan-btn" class="calendar-icon-btn" type="button" title="自动规划" aria-label="自动规划">
+          <button id="calendar-auto-plan-btn" class="calendar-icon-btn" type="button" title="自动规划" data-i18n-title="coop.toolbar.autoPlan" data-i18n-aria-label="coop.toolbar.autoPlan" aria-label="自动规划">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5v2a1 1 0 1 1-2 0V5H7v14h4a1 1 0 1 1 0 2H6.5A1.5 1.5 0 0 1 5 19.5v-15Zm9.22 6.22a1 1 0 0 1 1.41 0l3.37 3.37a1 1 0 0 1 0 1.41l-3.37 3.37a1 1 0 1 1-1.41-1.41L15.88 16H11a1 1 0 1 1 0-2h4.88l-1.66-1.66a1 1 0 0 1 0-1.41Z"/></svg>
           </button>
-          <button id="calendar-bulk-add-btn" class="calendar-icon-btn" type="button" title="批量添加普通任务" aria-label="批量添加普通任务">
+          <button id="calendar-bulk-add-btn" class="calendar-icon-btn" type="button" title="批量添加普通任务" data-i18n-title="coop.toolbar.bulkAdd" data-i18n-aria-label="coop.toolbar.bulkAdd" aria-label="批量添加普通任务">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v1A1.5 1.5 0 0 1 18.5 9h-13A1.5 1.5 0 0 1 4 7.5v-1Zm0 5A1.5 1.5 0 0 1 5.5 10h13a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 12.5v-1Zm1.5 3.5h13A1.5 1.5 0 0 1 20 16.5v1a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-1A1.5 1.5 0 0 1 5.5 15Z"/></svg>
           </button>
-          <button id="calendar-export-ics-btn" class="calendar-icon-btn" type="button" title="导出日历计划 (.ics)" aria-label="导出日历计划 (.ics)">
+          <button id="calendar-export-ics-btn" class="calendar-icon-btn" type="button" title="导出日历计划 (.ics)" data-i18n-title="coop.toolbar.exportIcs" data-i18n-aria-label="coop.toolbar.exportIcs" aria-label="导出日历计划 (.ics)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42L11 12.59V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1a1 1 0 0 1 1-1Z"/></svg>
           </button>
-          <button id="calendar-clear-btn" class="calendar-icon-btn danger" type="button" title="删除所有计划" aria-label="删除所有计划">
+          <button id="calendar-clear-btn" class="calendar-icon-btn danger" type="button" title="删除所有计划" data-i18n-title="coop.toolbar.clearAll" data-i18n-aria-label="coop.toolbar.clearAll" aria-label="删除所有计划">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4h4a1 1 0 1 1 0 2h-1v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6H5a1 1 0 1 1 0-2h4v-.5ZM8 6v13h8V6H8Zm2 3a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Z"/></svg>
           </button>
         </div>
       </div>
       <div id="schedule-list" class="card">
         <div class="calendar-month">
-          <h4 class="calendar-title">日历加载中...</h4>
+          <h4 class="calendar-title" data-i18n="coop.calendar.loading">日历加载中...</h4>
         </div>
       </div>
 
      </section>
 
     <section>
-      <h2>公式说明</h2>
-      <p>每局游戏经验 = (基础经验 + 奖励目标经验) × (1 + 难度加成 + 随机加成) + 首胜经验 + （每周第一次完成时的累积难度奖励）</p>
-      <p>基础经验：20000 xp（固定） | 奖励目标经验：2000 xp（固定） | 随机加成：随机地图时25% | 首胜经验：10000 xp</p>
-      <p>经验列表速查：</p>
+      <h2 data-i18n="single.formula.title">公式说明</h2>
+      <p data-i18n="single.formula.line1">每局游戏经验 = (基础经验 + 奖励目标经验) × (1 + 难度加成 + 随机加成) + 首胜经验 + （每周第一次完成时的累积难度奖励）</p>
+      <p data-i18n="single.formula.line2">基础经验：20000 xp（固定） | 奖励目标经验：2000 xp（固定） | 随机加成：随机地图时25% | 首胜经验：10000 xp</p>
+      <p data-i18n="single.quicklinks">经验列表速查：</p>
       <ul>
-        <li><a href="./commander-xp-table.html">指挥官1-15级经验列表</a></li>
-        <li><a href="./mastery-xp-table.html">精通0-90级经验列表</a></li>
-        <li><a href="./mutation-reward-table.html">每周突变奖励经验列表</a></li>
+        <li><a href="./commander-xp-table.html" data-i18n="index.card.commander.title">指挥官1-15级经验列表</a></li>
+        <li><a href="./mastery-xp-table.html" data-i18n="index.card.mastery.title">精通0-90级经验列表</a></li>
+        <li><a href="./mutation-reward-table.html" data-i18n="index.card.mutation.title">每周突变奖励经验列表</a></li>
       </ul>
     </section>
   </main>
@@ -220,47 +228,47 @@
   <div id="calendar-editor-modal" class="calendar-editor-modal" hidden>
     <div class="calendar-editor-backdrop" data-close-modal="true"></div>
     <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-editor-title">
-      <h3 id="calendar-editor-title">日历任务编辑</h3>
+      <h3 id="calendar-editor-title" data-i18n="coop.modal.editor.title">日历任务编辑</h3>
       <form id="calendar-editor-form" class="form-grid">
         <label>
-          计划日期
+          <span data-i18n="coop.field.date">计划日期</span>
           <input name="editDate" type="date" required>
         </label>
         <label>
-          局数
+          <span data-i18n="coop.field.games">局数</span>
           <input name="editGames" type="number" min="1" step="1" value="1" required>
         </label>
         <label>
-          任务类型
+          <span data-i18n="single.form.taskType">任务类型</span>
           <select name="editTaskType" required>
-            <option value="normal">普通任务</option>
-            <option value="mutation">突变任务</option>
+            <option value="normal" data-i18n="single.option.normalTask">普通任务</option>
+            <option value="mutation" data-i18n="single.option.mutationTask">突变任务</option>
           </select>
         </label>
         <label>
-          任务难度
+          <span data-i18n="coop.field.taskDifficulty">任务难度</span>
           <select name="editDifficulty" required>
-            <option value="casual">休闲</option>
-            <option value="normal">普通</option>
-            <option value="hard">困难</option>
-            <option value="brutal">残酷</option>
-            <option value="brutal1">残酷+1</option>
-            <option value="brutal2">残酷+2</option>
-            <option value="brutal3">残酷+3</option>
-            <option value="brutal4">残酷+4</option>
-            <option value="brutal5">残酷+5</option>
-            <option value="brutal6">残酷+6</option>
+            <option value="casual" data-i18n="difficulty.casual">休闲</option>
+            <option value="normal" data-i18n="difficulty.normal">普通</option>
+            <option value="hard" data-i18n="difficulty.hard">困难</option>
+            <option value="brutal" data-i18n="difficulty.brutal">残酷</option>
+            <option value="brutal1" data-i18n="difficulty.brutal1">残酷+1</option>
+            <option value="brutal2" data-i18n="difficulty.brutal2">残酷+2</option>
+            <option value="brutal3" data-i18n="difficulty.brutal3">残酷+3</option>
+            <option value="brutal4" data-i18n="difficulty.brutal4">残酷+4</option>
+            <option value="brutal5" data-i18n="difficulty.brutal5">残酷+5</option>
+            <option value="brutal6" data-i18n="difficulty.brutal6">残酷+6</option>
           </select>
         </label>
         <label class="checkbox">
           <input name="editRandomMapBonus" type="checkbox">
-          随机地图（+25%）
+          <span data-i18n="single.form.randomMap">随机地图（+25%）</span>
         </label>
       </form>
       <div class="calendar-editor-actions">
-        <button id="calendar-editor-save-btn" type="button">保存</button>
-        <button id="calendar-editor-delete-btn" type="button">删除</button>
-        <button id="calendar-editor-cancel-btn" type="button">取消</button>
+        <button id="calendar-editor-save-btn" type="button" data-i18n="common.save">保存</button>
+        <button id="calendar-editor-delete-btn" type="button" data-i18n="common.delete">删除</button>
+        <button id="calendar-editor-cancel-btn" type="button" data-i18n="common.cancel">取消</button>
       </div>
     </section>
   </div>
@@ -268,43 +276,43 @@
   <div id="calendar-bulk-modal" class="calendar-editor-modal" hidden>
     <div class="calendar-editor-backdrop" data-close-bulk-modal="true"></div>
     <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-bulk-title">
-      <h3 id="calendar-bulk-title">批量添加普通任务</h3>
+      <h3 id="calendar-bulk-title" data-i18n="coop.modal.bulk.title">批量添加普通任务</h3>
       <form id="calendar-bulk-form" class="form-grid">
         <label>
-          开始日期
+          <span data-i18n="coop.field.startDate">开始日期</span>
           <input name="bulkStartDate" type="date" required>
         </label>
         <label>
-          连续天数
+          <span data-i18n="coop.field.days">连续天数</span>
           <input name="bulkDays" type="number" min="1" step="1" value="7" required>
         </label>
         <label>
-          每日局数
+          <span data-i18n="coop.field.gamesPerDay">每日局数</span>
           <input name="bulkGamesPerDay" type="number" min="1" step="1" value="3" required>
         </label>
         <label>
-          任务难度
+          <span data-i18n="coop.field.taskDifficulty">任务难度</span>
           <select name="bulkDifficulty" required>
-            <option value="casual">休闲</option>
-            <option value="normal">普通</option>
-            <option value="hard">困难</option>
-            <option value="brutal">残酷</option>
-            <option value="brutal1">残酷+1</option>
-            <option value="brutal2">残酷+2</option>
-            <option value="brutal3">残酷+3</option>
-            <option value="brutal4">残酷+4</option>
-            <option value="brutal5">残酷+5</option>
-            <option value="brutal6">残酷+6</option>
+            <option value="casual" data-i18n="difficulty.casual">休闲</option>
+            <option value="normal" data-i18n="difficulty.normal">普通</option>
+            <option value="hard" data-i18n="difficulty.hard">困难</option>
+            <option value="brutal" data-i18n="difficulty.brutal">残酷</option>
+            <option value="brutal1" data-i18n="difficulty.brutal1">残酷+1</option>
+            <option value="brutal2" data-i18n="difficulty.brutal2">残酷+2</option>
+            <option value="brutal3" data-i18n="difficulty.brutal3">残酷+3</option>
+            <option value="brutal4" data-i18n="difficulty.brutal4">残酷+4</option>
+            <option value="brutal5" data-i18n="difficulty.brutal5">残酷+5</option>
+            <option value="brutal6" data-i18n="difficulty.brutal6">残酷+6</option>
           </select>
         </label>
         <label class="checkbox">
           <input name="bulkRandomMapBonus" type="checkbox">
-          随机地图（+25%）
+          <span data-i18n="single.form.randomMap">随机地图（+25%）</span>
         </label>
       </form>
       <div class="calendar-editor-actions">
-        <button id="calendar-bulk-save-btn" type="button">批量添加</button>
-        <button id="calendar-bulk-cancel-btn" type="button">取消</button>
+        <button id="calendar-bulk-save-btn" type="button" data-i18n="coop.modal.bulk.action">批量添加</button>
+        <button id="calendar-bulk-cancel-btn" type="button" data-i18n="common.cancel">取消</button>
       </div>
     </section>
   </div>
@@ -312,74 +320,74 @@
   <div id="calendar-auto-plan-modal" class="calendar-editor-modal" hidden>
     <div class="calendar-editor-backdrop" data-close-auto-plan-modal="true"></div>
     <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-auto-plan-title">
-      <h3 id="calendar-auto-plan-title">自动规划参数</h3>
+      <h3 id="calendar-auto-plan-title" data-i18n="coop.modal.autoPlan.title">自动规划参数</h3>
       <form id="calendar-auto-plan-form">
         <section class="auto-plan-group">
-          <h4>普通任务</h4>
+          <h4 data-i18n="single.option.normalTask">普通任务</h4>
           <div class="form-grid">
             <label>
-              开始日期
+              <span data-i18n="coop.field.startDate">开始日期</span>
               <input name="autoPlanStartDate" type="date" required>
             </label>
             <label>
-              每日普通任务局数
+              <span data-i18n="coop.field.dailyNormalGames">每日普通任务局数</span>
               <input name="autoPlanDailyNormalGames" type="number" min="1" step="1" value="3" required>
             </label>
             <label>
-              普通任务难度
+              <span data-i18n="coop.field.normalTaskDifficulty">普通任务难度</span>
               <select name="autoPlanDifficulty" required>
-                <option value="casual">休闲</option>
-                <option value="normal">普通</option>
-                <option value="hard">困难</option>
-                <option value="brutal">残酷</option>
-                <option value="brutal1">残酷+1</option>
-                <option value="brutal2">残酷+2</option>
-                <option value="brutal3">残酷+3</option>
-                <option value="brutal4">残酷+4</option>
-                <option value="brutal5">残酷+5</option>
-                <option value="brutal6">残酷+6</option>
+                <option value="casual" data-i18n="difficulty.casual">休闲</option>
+                <option value="normal" data-i18n="difficulty.normal">普通</option>
+                <option value="hard" data-i18n="difficulty.hard">困难</option>
+                <option value="brutal" data-i18n="difficulty.brutal">残酷</option>
+                <option value="brutal1" data-i18n="difficulty.brutal1">残酷+1</option>
+                <option value="brutal2" data-i18n="difficulty.brutal2">残酷+2</option>
+                <option value="brutal3" data-i18n="difficulty.brutal3">残酷+3</option>
+                <option value="brutal4" data-i18n="difficulty.brutal4">残酷+4</option>
+                <option value="brutal5" data-i18n="difficulty.brutal5">残酷+5</option>
+                <option value="brutal6" data-i18n="difficulty.brutal6">残酷+6</option>
               </select>
             </label>
             <label class="auto-plan-toggle">
-              <span class="auto-plan-toggle-title">随机地图加成</span>
+              <span class="auto-plan-toggle-title" data-i18n="coop.field.randomMapBonus">随机地图加成</span>
               <span class="auto-plan-toggle-control">
                 <input name="autoPlanRandomMapBonus" type="checkbox">
-                随机地图（+25%）
+                <span data-i18n="single.form.randomMap">随机地图（+25%）</span>
               </span>
             </label>
           </div>
         </section>
         <section class="auto-plan-group">
-          <h4>突变任务</h4>
+          <h4 data-i18n="single.option.mutationTask">突变任务</h4>
           <div class="form-grid">
             <label>
               <span class="label-with-tip">
-                突变任务等级
-                <span class="help-tip" tabindex="0" role="note" aria-label="仅影响每周额外突变任务与其奖励，不影响普通任务">?</span>
+                <span data-i18n="coop.field.mutationDifficulty">突变任务等级</span>
+                <span class="help-tip" tabindex="0" role="note" aria-label="仅影响每周额外突变任务与其奖励，不影响普通任务" data-i18n-aria-label="coop.tip.mutationDifficulty">?</span>
               </span>
               <select name="autoPlanMutationDifficulty" required>
-                <option value="casual">休闲</option>
-                <option value="normal">普通</option>
-                <option value="hard">困难</option>
-                <option value="savage" selected>残酷</option>
+                <option value="casual" data-i18n="difficulty.casual">休闲</option>
+                <option value="normal" data-i18n="difficulty.normal">普通</option>
+                <option value="hard" data-i18n="difficulty.hard">困难</option>
+                <option value="savage" selected data-i18n="difficulty.brutal">残酷</option>
               </select>
             </label>
             <label class="auto-plan-toggle">
               <span class="label-with-tip auto-plan-toggle-title">
-                挑战突变任务（每周额外安排）
-                <span class="help-tip" tabindex="0" role="note" aria-label="开启后会在每周额外安排 1 场突变任务">?</span>
+                <span data-i18n="coop.field.challengeMutation">挑战突变任务（每周额外安排）</span>
+                <span class="help-tip" tabindex="0" role="note" aria-label="开启后会在每周额外安排 1 场突变任务" data-i18n-aria-label="coop.tip.challengeMutation">?</span>
               </span>
               <span class="auto-plan-toggle-control">
                 <input name="autoPlanChallengeMutation" type="checkbox">
-                启用挑战突变任务
+                <span data-i18n="coop.field.enableChallengeMutation">启用挑战突变任务</span>
               </span>
             </label>
           </div>
         </section>
       </form>
       <div class="calendar-editor-actions">
-        <button id="calendar-auto-plan-generate-btn" type="button">生成计划</button>
-        <button id="calendar-auto-plan-cancel-btn" type="button">取消</button>
+        <button id="calendar-auto-plan-generate-btn" type="button" data-i18n="coop.modal.autoPlan.generate">生成计划</button>
+        <button id="calendar-auto-plan-cancel-btn" type="button" data-i18n="common.cancel">取消</button>
       </div>
     </section>
   </div>
@@ -387,34 +395,39 @@
   <div id="calendar-export-modal" class="calendar-editor-modal" hidden>
     <div class="calendar-editor-backdrop" data-close-export-modal="true"></div>
     <section class="calendar-editor-panel card" role="dialog" aria-modal="true" aria-labelledby="calendar-export-title">
-      <h3 id="calendar-export-title">导出日历计划（.ics）</h3>
+      <h3 id="calendar-export-title" data-i18n="coop.modal.export.title">导出日历计划（.ics）</h3>
       <form id="calendar-export-form" class="form-grid">
         <label>
-          导出范围
+          <span data-i18n="coop.field.exportScope">导出范围</span>
           <select name="exportScope" required>
-            <option value="all" selected>全部计划任务</option>
-            <option value="currentMonth">当前显示月份</option>
+            <option value="all" selected data-i18n="coop.option.allTasks">全部计划任务</option>
+            <option value="currentMonth" data-i18n="coop.option.currentMonth">当前显示月份</option>
           </select>
         </label>
         <label>
-          事件开始时间
+          <span data-i18n="coop.field.eventStartTime">事件开始时间</span>
           <input name="exportStartTime" type="time" value="20:00" required>
         </label>
       </form>
       <div class="calendar-editor-actions">
-        <button id="calendar-export-confirm-btn" type="button">导出 .ics</button>
-        <button id="calendar-export-cancel-btn" type="button">取消</button>
+        <button id="calendar-export-confirm-btn" type="button" data-i18n="coop.modal.export.confirm">导出 .ics</button>
+        <button id="calendar-export-cancel-btn" type="button" data-i18n="common.cancel">取消</button>
       </div>
     </section>
   </div>
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2026 星际争霸2工具站</p>
+      <p data-i18n="site.footer">© 2026 星际争霸2工具站</p>
     </div>
   </footer>
   <script defer src="../assets/js/analytics-config.js"></script>
   <script defer src="../assets/js/analytics.js"></script>
+  <script defer src="../assets/js/xp-data.js"></script>
+  <script defer src="../assets/js/i18n-coop-extra.js"></script>
+  <script defer src="../assets/js/i18n.js"></script>
+  <script defer src="../assets/js/coop-xp-infra.js"></script>
+  <script defer src="../assets/js/coop-xp-domain.js"></script>
   <script defer src="../assets/js/coop-xp.js"></script>
 </body>
 </html>

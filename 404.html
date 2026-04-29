@@ -12,41 +12,52 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>页面未找到 - 星际争霸2工具站</title>
+  <title data-i18n="head.404.title">页面未找到 - 星际争霸2工具站</title>
   <meta name="robots" content="noindex,follow">
-  <meta name="description" content="你访问的页面不存在，返回星际争霸2工具站首页继续使用经验计算器与Replay工具。">
+  <meta name="description" content="你访问的页面不存在，返回星际争霸2工具站首页继续使用经验计算器与练级工具。" data-i18n-content="head.404.description">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="页面未找到" data-i18n-content="head.404.ogTitle">
+  <meta property="og:description" content="该页面不存在，请返回首页继续使用工具。" data-i18n-content="head.404.ogDescription">
+  <meta property="og:url" content="https://example.com/404.html">
   <link rel="canonical" href="https://example.com/404.html">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <a class="skip-link" href="#main-content" data-i18n="common.skipToContent">跳到主要内容</a>
   <header class="site-header">
     <div class="container">
-      <h1 class="logo"><a href="./">星际争霸2工具站</a></h1>
-      <nav aria-label="主导航">
-        <ul class="nav-list">
-          <li><a href="tools/single-xp.html">单局经验计算器</a></li>
-          <li><a href="tools/coop-xp.html">合作练级日历</a></li>
-          <li><a href="tools/replay-viewer.html">Replay在线查看</a></li>
-        </ul>
-      </nav>
+      <h1 class="logo"><a href="./" data-i18n="site.name">星际争霸2工具站</a></h1>
+      <div class="header-actions">
+        <nav aria-label="主导航" data-i18n-aria-label="aria.mainNav">
+          <ul class="nav-list">
+            <li><a href="tools/single-xp.html" data-i18n="nav.single">单局经验计算器</a></li>
+            <li><a href="tools/coop-xp.html" data-i18n="nav.coop">合作练级日历</a></li>
+          </ul>
+        </nav>
+        <div class="lang-switcher" aria-label="language switcher" data-i18n-aria-label="aria.languageSwitcher">
+          <label for="lang-select-404" data-i18n="lang.switcher.label">语言</label>
+          <select id="lang-select-404" data-lang-select>
+            <option value="zh" data-i18n="lang.zh">中文</option>
+            <option value="en" data-i18n="lang.en">EN</option>
+          </select>
+        </div>
+      </div>
     </div>
   </header>
 
   <main id="main-content" class="container">
     <section class="hero">
-      <h2>404 - 页面未找到</h2>
-      <p class="hint">你访问的地址可能已变更、被删除，或输入有误。</p>
+      <h2 data-i18n="404.title">404 - 页面未找到</h2>
+      <p class="hint" data-i18n="404.desc">你访问的地址可能已变更、被删除，或输入有误。</p>
     </section>
 
     <section>
       <article class="card">
-        <h3>可以试试以下入口</h3>
+        <h3 data-i18n="404.entry.title">可以试试以下入口</h3>
         <ul>
-          <li><a href="./">返回首页</a></li>
-          <li><a href="tools/single-xp.html">单局游戏经验计算</a></li>
-          <li><a href="tools/coop-xp.html">合作模式经验计算器</a></li>
-          <li><a href="tools/replay-viewer.html">Replay在线查看</a></li>
+          <li><a href="./" data-i18n="404.entry.home">返回首页</a></li>
+          <li><a href="tools/single-xp.html" data-i18n="index.card.single.title">单局游戏经验计算</a></li>
+          <li><a href="tools/coop-xp.html" data-i18n="index.card.coop.title">合作模式经验计算器</a></li>
         </ul>
       </article>
     </section>
@@ -54,10 +65,11 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2026 星际争霸2工具站</p>
+      <p data-i18n="site.footer">© 2026 星际争霸2工具站</p>
     </div>
   </footer>
   <script defer src="assets/js/analytics-config.js"></script>
   <script defer src="assets/js/analytics.js"></script>
+  <script defer src="assets/js/i18n.js"></script>
 </body>
 </html>

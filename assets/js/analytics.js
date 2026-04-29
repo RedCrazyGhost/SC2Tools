@@ -131,6 +131,58 @@
     }
   }
 
+  function trackTiming(name, durationMs, params) {
+    const metricName = String(name || "").trim();
+    if (!metricName) return;
+    const duration = Math.max(0, Math.round(Number(durationMs) || 0));
+    trackEvent("perf_timing", {
+      metric_name: metricName,
+      duration_ms: duration,
+      event_category: "performance",
+      ...(params || {})
+    });
+  }
+
+  function initErrorTracking() {
+    window.addEventListener("error", function (event) {
+      trackEvent("frontend_error", {
+        event_category: "error",
+        event_label: "window_error",
+        message: String(event.message || "").slice(0, 240),
+        source: String(event.filename || "").slice(0, 240),
+        line: Number(event.lineno) || 0,
+        column: Number(event.colno) || 0
+      });
+    });
+    window.addEventListener("unhandledrejection", function (event) {
+      const reason = event.reason;
+      const text = reason && typeof reason === "object" && "message" in reason
+        ? String(reason.message || "")
+        : String(reason || "");
+      trackEvent("frontend_error", {
+        event_category: "error",
+        event_label: "unhandled_rejection",
+        message: text.slice(0, 240)
+      });
+    });
+  }
+
+  function initLongTaskTracking() {
+    if (!("PerformanceObserver" in window)) return;
+    try {
+      const observer = new PerformanceObserver(function (list) {
+        list.getEntries().forEach(function (entry) {
+          trackTiming("long_task", entry.duration, {
+            entry_name: String(entry.name || "unknown").slice(0, 120)
+          });
+        });
+      });
+      observer.observe({ entryTypes: ["longtask"] });
+    } catch (error) {
+      logDebug("longtask_observer_not_supported", error);
+    }
+  }
+
   function trackAutoClick(event) {
     const target = event.target instanceof Element ? event.target.closest("a,button,[role='button']") : null;
     if (!target) return;
@@ -194,6 +246,8 @@
     if (initialized) return;
     initialized = true;
     initAutoTracking();
+    initErrorTracking();
+    initLongTaskTracking();
     if (typeof window.gtag === "function") {
       trackPageView();
     } else {
@@ -205,6 +259,7 @@
     initAnalytics,
     trackEvent,
     trackPageView,
+    trackTiming,
     getToolName: function () {
       return detectToolName(window.location.pathname);
     }

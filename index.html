@@ -12,12 +12,12 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>星际争霸2工具站 - 经验计算器与Replay查看</title>
-  <meta name="description" content="星际争霸2工具站提供合作模式经验计算器与Replay在线元数据查看，纯前端实现，快速、安全、无需上传文件。">
+  <title data-i18n="head.index.title">星际争霸2工具站 - 经验计算器与练级工具</title>
+  <meta name="description" content="星际争霸2工具站提供合作模式经验计算器与练级工具，纯前端实现，快速、安全、无需登录。" data-i18n-content="head.index.description">
   <link rel="canonical" href="https://example.com/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="星际争霸2工具站">
-  <meta property="og:description" content="合作模式经验计算器与Replay在线查看。">
+  <meta property="og:title" content="星际争霸2工具站" data-i18n-content="site.name">
+  <meta property="og:description" content="合作模式经验计算器与练级工具。" data-i18n-content="head.index.ogDescription">
   <meta property="og:url" content="https://example.com/">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="assets/css/main.css">
@@ -47,89 +47,82 @@
             "@type": "Answer",
             "text": "是。首版按公开可验证规则实现，并将关键参数配置化，便于版本更新。"
           }
-        },
-        {
-          "@type": "Question",
-          "name": "Replay文件会上传服务器吗？",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "不会。解析在你的浏览器本地完成，默认不上传文件。"
-          }
         }
       ]
     }
   </script>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <a class="skip-link" href="#main-content" data-i18n="common.skipToContent">跳到主要内容</a>
   <header class="site-header">
     <div class="container">
-      <h1 class="logo"><a href="./">星际争霸2工具站</a></h1>
-      <nav aria-label="主导航">
-        <ul class="nav-list">
-          <li><a href="tools/single-xp.html">单局经验计算器</a></li>
-          <li><a href="tools/coop-xp.html">合作练级日历</a></li>
-          <li><a href="tools/replay-viewer.html">Replay在线查看</a></li>
-        </ul>
-      </nav>
+      <h1 class="logo"><a href="./" data-i18n="site.name">星际争霸2工具站</a></h1>
+      <div class="header-actions">
+        <nav aria-label="主导航" data-i18n-aria-label="aria.mainNav">
+          <ul class="nav-list">
+            <li><a href="tools/single-xp.html" data-i18n="nav.single">单局经验计算器</a></li>
+            <li><a href="tools/coop-xp.html" data-i18n="nav.coop">合作练级日历</a></li>
+          </ul>
+        </nav>
+        <div class="lang-switcher" aria-label="language switcher" data-i18n-aria-label="aria.languageSwitcher">
+          <label for="lang-select-index" data-i18n="lang.switcher.label">语言</label>
+          <select id="lang-select-index" data-lang-select>
+            <option value="zh" data-i18n="lang.zh">中文</option>
+            <option value="en" data-i18n="lang.en">EN</option>
+          </select>
+        </div>
+      </div>
     </div>
   </header>
 
   <main id="main-content" class="container">
     <section class="hero">
-      <h2>专为星际争霸2玩家打造的轻量工具集合</h2>
-      <p>使用原生HTML/CSS/JS构建，首屏可抓取、加载快、移动端友好。</p>
+      <h2 data-i18n="index.hero.title">专为星际争霸2玩家打造的轻量工具集合</h2>
+      <p data-i18n="index.hero.desc">使用原生HTML/CSS/JS构建，首屏可抓取、加载快、移动端友好。</p>
     </section>
 
     <section aria-labelledby="tool-list-title">
-      <h2 id="tool-list-title">工具列表</h2>
+      <h2 id="tool-list-title" data-i18n="index.tools.title">工具列表</h2>
       <div class="card-grid">
         <article class="card">
-          <h3><a href="tools/single-xp.html">单局游戏经验计算</a></h3>
-          <p>按公开规则快速计算单局经验，支持难度、随机地图、首胜和突变奖励。</p>
+          <h3><a href="tools/single-xp.html" data-i18n="index.card.single.title">单局游戏经验计算</a></h3>
+          <p data-i18n="index.card.single.desc">按公开规则快速计算单局经验，支持难度、随机地图、首胜和突变奖励。</p>
         </article>
         <article class="card">
-          <h3><a href="tools/coop-xp.html">合作模式经验计算器</a></h3>
-          <p>计算升级所需经验并可手动同步到日历目标经验，支持合作任务计划。</p>
+          <h3><a href="tools/coop-xp.html" data-i18n="index.card.coop.title">合作模式经验计算器</a></h3>
+          <p data-i18n="index.card.coop.desc">计算升级所需经验并可手动同步到日历目标经验，支持合作任务计划。</p>
         </article>
         <article class="card">
-          <h3><a href="tools/replay-viewer.html">Replay在线查看</a></h3>
-          <p>本地解析SC2Replay文件，展示地图、玩家、种族、对局时长等元数据。</p>
+          <h3><a href="tools/commander-xp-table.html" data-i18n="index.card.commander.title">指挥官1-15级经验列表</a></h3>
+          <p data-i18n="index.card.commander.desc">快速查询每级升级所需经验与累计经验，便于安排指挥官练级计划。</p>
         </article>
         <article class="card">
-          <h3><a href="tools/commander-xp-table.html">指挥官1-15级经验列表</a></h3>
-          <p>快速查询每级升级所需经验与累计经验，便于安排指挥官练级计划。</p>
+          <h3><a href="tools/mastery-xp-table.html" data-i18n="index.card.mastery.title">精通0-90级经验列表</a></h3>
+          <p data-i18n="index.card.mastery.desc">查看精通等级经验曲线，并附90级后晋升每级固定经验说明。</p>
         </article>
         <article class="card">
-          <h3><a href="tools/mastery-xp-table.html">精通0-90级经验列表</a></h3>
-          <p>查看精通等级经验曲线，并附90级后晋升每级固定经验说明。</p>
-        </article>
-        <article class="card">
-          <h3><a href="tools/mutation-reward-table.html">每周突变奖励经验列表</a></h3>
-          <p>查看休闲到残酷各档突变奖励经验与累积奖励。</p>
+          <h3><a href="tools/mutation-reward-table.html" data-i18n="index.card.mutation.title">每周突变奖励经验列表</a></h3>
+          <p data-i18n="index.card.mutation.desc">查看休闲到残酷各档突变奖励经验与累积奖励。</p>
         </article>
       </div>
     </section>
 
     <section aria-labelledby="faq-title">
-      <h2 id="faq-title">常见问题</h2>
+      <h2 id="faq-title" data-i18n="index.faq.title">常见问题</h2>
       <article>
-        <h3>这个站点是否需要登录？</h3>
-        <p>不需要。所有基础工具可直接使用。</p>
-      </article>
-      <article>
-        <h3>Replay是否会上传到云端？</h3>
-        <p>默认不会，解析在浏览器内执行。</p>
+        <h3 data-i18n="index.faq.login.q">这个站点是否需要登录？</h3>
+        <p data-i18n="index.faq.login.a">不需要。所有基础工具可直接使用。</p>
       </article>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2026 星际争霸2工具站</p>
+      <p data-i18n="site.footer">© 2026 星际争霸2工具站</p>
     </div>
   </footer>
   <script defer src="assets/js/analytics-config.js"></script>
   <script defer src="assets/js/analytics.js"></script>
+  <script defer src="assets/js/i18n.js"></script>
 </body>
 </html>

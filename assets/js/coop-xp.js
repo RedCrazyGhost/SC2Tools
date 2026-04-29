@@ -1,281 +1,66 @@
 (function () {
   "use strict";
 
-  function trackAnalyticsEvent(eventName, params) {
-    if (!window.SC2Analytics || typeof window.SC2Analytics.trackEvent !== "function") {
-      return;
-    }
-    window.SC2Analytics.trackEvent(eventName, params);
+  const infra = window.SC2CoopXpInfra;
+  const domain = window.SC2CoopXpDomain;
+  if (!infra || !domain) {
+    return;
   }
+  const {
+    trackAnalyticsEvent,
+    t,
+    formatXp,
+    toPercentText,
+    formatGamesCount,
+    formatDuration,
+    createDebouncer
+  } = infra;
+  const {
+    parseDateInput,
+    dateToInput,
+    addDays,
+    getMonthKey,
+    clampViewDate,
+    mapDifficultyToMutationDifficulty
+  } = domain;
 
-  const XP_CONFIG = {
-    baseXp: 20000,
-    objectiveXp: 2000,
-    difficultyBonus: {
-      casual: 0,
-      normal: 0.2,
-      hard: 0.5,
-      brutal: 1.0,
-      brutal1: 1.75,
-      brutal2: 2.0,
-      brutal3: 2.25,
-      brutal4: 2.5,
-      brutal5: 2.75,
-      brutal6: 3.0
-    },
-    randomMapBonus: 0.25,
-    firstWinFlatBonus: 10000,
-    mutationReward: {
-      casual: 25000,
-      normal: 35000,
-      hard: 50000,
-      savage: 75000
-    },
-    commanderLevels: {
-      cumulativeAtLevel: {
-        1: 0,
-        2: 20000,
-        3: 60000,
-        4: 105000,
-        5: 155000,
-        6: 210000,
-        7: 270000,
-        8: 337500,
-        9: 412500,
-        10: 495000,
-        11: 585000,
-        12: 685000,
-        13: 795000,
-        14: 915000,
-        15: 1045000
-      },
-      xpToNextLevel: {
-        1: 20000,
-        2: 40000,
-        3: 45000,
-        4: 50000,
-        5: 55000,
-        6: 60000,
-        7: 67500,
-        8: 75000,
-        9: 82500,
-        10: 90000,
-        11: 100000,
-        12: 110000,
-        13: 120000,
-        14: 130000,
-        15: 0
-      }
-    },
-    mastery: {
-      xpToNextLevel: {
-        0: 5000,
-        1: 20000,
-        2: 20500,
-        3: 21000,
-        4: 21500,
-        5: 22000,
-        6: 22500,
-        7: 23000,
-        8: 24000,
-        9: 25000,
-        10: 26000,
-        11: 27000,
-        12: 28000,
-        13: 30000,
-        14: 32000,
-        15: 34000,
-        16: 36000,
-        17: 38000,
-        18: 41000,
-        19: 44000,
-        20: 47000,
-        21: 50000,
-        22: 54000,
-        23: 58000,
-        24: 62000,
-        25: 66000,
-        26: 71000,
-        27: 76000,
-        28: 81000,
-        29: 86000,
-        30: 89000,
-        31: 92000,
-        32: 95000,
-        33: 99000,
-        34: 103000,
-        35: 107000,
-        36: 111000,
-        37: 115000,
-        38: 119000,
-        39: 123000,
-        40: 127000,
-        41: 131000,
-        42: 135000,
-        43: 139000,
-        44: 143000,
-        45: 147000,
-        46: 151000,
-        47: 155000,
-        48: 160000,
-        49: 165000,
-        50: 170000,
-        51: 175000,
-        52: 180000,
-        53: 185000,
-        54: 191000,
-        55: 197000,
-        56: 203000,
-        57: 209000,
-        58: 215000,
-        59: 222000,
-        60: 229000,
-        61: 236000,
-        62: 243000,
-        63: 250000,
-        64: 258000,
-        65: 266000,
-        66: 274000,
-        67: 282000,
-        68: 290000,
-        69: 299000,
-        70: 308000,
-        71: 317000,
-        72: 326000,
-        73: 335000,
-        74: 345000,
-        75: 355000,
-        76: 365000,
-        77: 375000,
-        78: 385000,
-        79: 395000,
-        80: 415000,
-        81: 445000,
-        82: 485000,
-        83: 535000,
-        84: 595000,
-        85: 665000,
-        86: 745000,
-        87: 835000,
-        88: 935000,
-        89: 1035000
-      },
-      ascensionPerLevelXp: 200000
-    }
-  };
+  const XP_CONFIG = window.SC2XPData;
+  if (!XP_CONFIG) {
+    return;
+  }
   const MASTERY_MAX_LEVEL = 1000;
-
-  function toPercentText(value) {
-    return `${Math.round(value * 100)}%`;
-  }
-
-  function formatXp(value) {
-    return `${Math.round(Number(value) || 0).toLocaleString()} xp`;
-  }
-
-  function formatDuration(minutes) {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    if (h <= 0) {
-      return `${m}分钟`;
-    }
-    return `${h}小时${m}分钟`;
-  }
-
-  function parseDateInput(value) {
-    const parts = String(value || "").split("-");
-    if (parts.length !== 3) return null;
-    const year = Number(parts[0]);
-    const month = Number(parts[1]) - 1;
-    const day = Number(parts[2]);
-    const date = new Date(year, month, day);
-    if (Number.isNaN(date.getTime())) return null;
-    date.setHours(0, 0, 0, 0);
-    return date;
-  }
-
-  function dateToInput(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
-  function addDays(date, days) {
-    const next = new Date(date);
-    next.setDate(next.getDate() + days);
-    next.setHours(0, 0, 0, 0);
-    return next;
-  }
-
-  function getMonthKey(date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-  }
+  const masteryCumulativeCache = [0];
 
   function getMonthLabel(date) {
-    return `${date.getFullYear()}年${date.getMonth() + 1}月`;
-  }
-
-  function clampViewDate(date) {
-    const d = new Date(date);
-    d.setDate(1);
-    d.setHours(0, 0, 0, 0);
-    return d;
+    return t("calendar.monthLabel").replace("{year}", String(date.getFullYear())).replace("{month}", String(date.getMonth() + 1));
   }
 
   function calculateXp(input, mutationReward) {
-    const base = XP_CONFIG.baseXp + XP_CONFIG.objectiveXp;
-    const diffBonus = XP_CONFIG.difficultyBonus[input.difficulty] || 0;
-    const randomBonus = input.randomMapBonus ? XP_CONFIG.randomMapBonus : 0;
-    const firstWin = input.firstWinBonus ? XP_CONFIG.firstWinFlatBonus : 0;
-    const core = base * (1 + diffBonus + randomBonus);
-    const mutationBonus = input.taskType === "mutation" ? mutationReward : 0;
-    const total = Math.round(core + firstWin + mutationBonus);
-    return {
-      total,
-      taskType: input.taskType,
-      breakdown: {
-        baseXp: XP_CONFIG.baseXp,
-        objectiveXp: XP_CONFIG.objectiveXp,
-        subtotal: base,
-        diffBonus,
-        randomBonus,
-        firstWin,
-        mutationBonus
-      }
-    };
+    return domain.calculateXp(input, mutationReward, XP_CONFIG);
   }
 
   function calculatePerGameXpByConfig(difficulty, randomMapBonus) {
-    const base = XP_CONFIG.baseXp + XP_CONFIG.objectiveXp;
-    const diffBonus = XP_CONFIG.difficultyBonus[difficulty] || 0;
-    const randomBonus = randomMapBonus ? XP_CONFIG.randomMapBonus : 0;
-    return Math.round(base * (1 + diffBonus + randomBonus));
+    return domain.calculatePerGameXpByConfig(difficulty, randomMapBonus, XP_CONFIG);
   }
 
   function calculateMutationReward(difficulty) {
-    return XP_CONFIG.mutationReward[difficulty] || 0;
-  }
-
-  function mapDifficultyToMutationDifficulty(difficulty) {
-    if (difficulty === "casual") return "casual";
-    if (difficulty === "normal") return "normal";
-    if (difficulty === "hard") return "hard";
-    return "savage";
+    return domain.calculateMutationReward(difficulty, XP_CONFIG);
   }
 
   function renderResult(target, result) {
-    const firstWinText = result.taskType === "mutation" ? "每周首胜经验" : "每日首胜经验";
+    const firstWinText = result.taskType === "mutation"
+      ? t("single.result.firstwin.weekly")
+      : t("single.result.firstwin.daily");
     target.innerHTML = [
-      `<p><strong>每局经验：</strong>${formatXp(result.total)}</p>`,
+      `<p><strong>${t("single.result.total")}</strong>${formatXp(result.total)}</p>`,
       "<ul>",
-      `<li>基础经验：${formatXp(result.breakdown.baseXp)}</li>`,
-      `<li>奖励目标经验：${formatXp(result.breakdown.objectiveXp)}</li>`,
-      `<li>基础合计：${formatXp(result.breakdown.subtotal)}</li>`,
-      `<li>难度加成：${toPercentText(result.breakdown.diffBonus)}</li>`,
-      `<li>随机地图加成：${toPercentText(result.breakdown.randomBonus)}</li>`,
+      `<li>${t("single.result.base")}${formatXp(result.breakdown.baseXp)}</li>`,
+      `<li>${t("single.result.objective")}${formatXp(result.breakdown.objectiveXp)}</li>`,
+      `<li>${t("single.result.subtotal")}${formatXp(result.breakdown.subtotal)}</li>`,
+      `<li>${t("single.result.diff")}${toPercentText(result.breakdown.diffBonus)}</li>`,
+      `<li>${t("single.result.random")}${toPercentText(result.breakdown.randomBonus)}</li>`,
       `<li>${firstWinText}：${formatXp(result.breakdown.firstWin)}</li>`,
-      `<li>突变奖励：${formatXp(result.breakdown.mutationBonus)}</li>`,
+      `<li>${t("single.result.mutation")}${formatXp(result.breakdown.mutationBonus)}</li>`,
       "</ul>"
     ].join("");
   }
@@ -390,18 +175,23 @@
     settle: 20
   };
 
-  const DIFFICULTY_LABELS = {
-    casual: "休闲",
-    normal: "普通",
-    hard: "困难",
-    brutal: "残酷",
-    brutal1: "残酷+1",
-    brutal2: "残酷+2",
-    brutal3: "残酷+3",
-    brutal4: "残酷+4",
-    brutal5: "残酷+5",
-    brutal6: "残酷+6"
+  const DIFFICULTY_I18N_KEYS = {
+    casual: "difficulty.casual",
+    normal: "difficulty.normal",
+    hard: "difficulty.hard",
+    brutal: "difficulty.brutal",
+    brutal1: "difficulty.brutal1",
+    brutal2: "difficulty.brutal2",
+    brutal3: "difficulty.brutal3",
+    brutal4: "difficulty.brutal4",
+    brutal5: "difficulty.brutal5",
+    brutal6: "difficulty.brutal6"
   };
+
+  function getDifficultyLabel(difficulty) {
+    const key = DIFFICULTY_I18N_KEYS[difficulty];
+    return key ? t(key) : difficulty;
+  }
 
   const dualRangeState = {
     suppressRefresh: false,
@@ -415,9 +205,9 @@
     })
   };
 
-  let coopScheduleDebounceTimer = null;
   let coopExportModulePromise = null;
   const COOP_SCHEDULE_DEBOUNCE_MS = 120;
+  const scheduleRefreshDebouncer = createDebouncer(COOP_SCHEDULE_DEBOUNCE_MS);
 
   function loadCoopExportModule() {
     if (!coopExportModulePromise) {
@@ -427,10 +217,7 @@
   }
 
   function cancelCoopScheduleDebounce() {
-    if (coopScheduleDebounceTimer) {
-      clearTimeout(coopScheduleDebounceTimer);
-      coopScheduleDebounceTimer = null;
-    }
+    scheduleRefreshDebouncer.cancel();
   }
 
   function getCommanderMaxTotalXp() {
@@ -478,7 +265,7 @@
         total,
         label: String(level),
         showLabel: true,
-        title: `等级 ${level}（累计经验 ${formatXp(total)}）`
+        title: t("calendar.levelTooltip").replace("{level}", String(level)).replace("{xp}", formatXp(total))
       });
     }
     return ticks;
@@ -501,7 +288,7 @@
         total,
         label: String(level),
         showLabel: keyLevels.has(level),
-        title: `等级 ${level}（累计经验 ${formatXp(total)}）`
+        title: t("calendar.levelTooltip").replace("{level}", String(level)).replace("{xp}", formatXp(total))
       });
       level += 1;
     }
@@ -742,7 +529,7 @@
     const targetTotal = toTotalCommanderXp(levelingInput.targetLevel, levelingInput.targetLevelXp);
     const neededXp = targetTotal - startTotal;
     if (neededXp <= 0) {
-      return { neededXp: 0, neededGames: 0, message: "目标经验不高于当前经验，无需额外对局。" };
+      return { neededXp: 0, neededGames: 0, message: t("coop.msg.noExtraGamesCommander") };
     }
     return {
       neededXp,
@@ -757,7 +544,7 @@
       return;
     }
     target.innerHTML = [
-      `<p class="xp-result-line"><span><strong>需要获得经验：</strong>${formatXp(levelingResult.neededXp)}</span>${renderSyncToggleButton()}</p>`
+      `<p class="xp-result-line"><span><strong>${t("coop.leveling.needxp")}</strong>${formatXp(levelingResult.neededXp)}</span>${renderSyncToggleButton()}</p>`
     ].join("");
   }
 
@@ -768,13 +555,17 @@
 
   function getMasteryCumulativeAtLevel(level) {
     const lv = clampMasteryLevel(level);
-    let total = 0;
-    let current = 0;
+    if (masteryCumulativeCache[lv] !== undefined) {
+      return masteryCumulativeCache[lv];
+    }
+    let current = masteryCumulativeCache.length - 1;
+    let total = masteryCumulativeCache[current];
     while (current < lv) {
       total += getMasteryXpToNext(current);
       current += 1;
+      masteryCumulativeCache[current] = total;
     }
-    return total;
+    return masteryCumulativeCache[lv];
   }
 
   function toTotalMasteryXp(level, levelXp) {
@@ -790,7 +581,7 @@
     const targetTotal = toTotalMasteryXp(input.targetLevel, input.targetLevelXp);
     const neededXp = targetTotal - startTotal;
     if (neededXp <= 0) {
-      return { neededXp: 0, neededGames: 0, message: "目标精通/晋升经验不高于当前经验，无需额外对局。" };
+      return { neededXp: 0, neededGames: 0, message: t("coop.msg.noExtraGamesMastery") };
     }
     return {
       neededXp,
@@ -805,7 +596,7 @@
       return;
     }
     target.innerHTML = [
-      `<p class="xp-result-line"><span><strong>需要获得经验：</strong>${formatXp(masteryResult.neededXp)}</span>${renderSyncToggleButton()}</p>`
+      `<p class="xp-result-line"><span><strong>${t("coop.leveling.needxp")}</strong>${formatXp(masteryResult.neededXp)}</span>${renderSyncToggleButton()}</p>`
     ].join("");
   }
 
@@ -840,28 +631,28 @@
   function validateInputs(mode, levelingInput, masteryInput) {
     if (mode === "mastery") {
       if (masteryInput.startLevel > MASTERY_MAX_LEVEL || masteryInput.targetLevel > MASTERY_MAX_LEVEL) {
-        onValidationWarning(`精通/晋升等级不能超过 ${MASTERY_MAX_LEVEL}。`);
+        onValidationWarning(t("coop.warn.masteryMax").replace("{max}", String(MASTERY_MAX_LEVEL)));
         return false;
       }
       const masteryStartCap = getMasteryXpToNext(Math.max(0, Math.floor(masteryInput.startLevel)));
       if (masteryInput.startLevelXp > masteryStartCap) {
-        onValidationWarning(`精通/晋升起始等级当前经验不能超过该等级上限（${formatXp(masteryStartCap)}）。`);
+        onValidationWarning(t("coop.warn.masteryStartCap").replace("{cap}", formatXp(masteryStartCap)));
         return false;
       }
       const masteryTargetCap = getMasteryXpToNext(Math.max(0, Math.floor(masteryInput.targetLevel)));
       if (masteryInput.targetLevelXp > masteryTargetCap) {
-        onValidationWarning(`精通/晋升目标等级当前经验不能超过该等级上限（${formatXp(masteryTargetCap)}）。`);
+        onValidationWarning(t("coop.warn.masteryTargetCap").replace("{cap}", formatXp(masteryTargetCap)));
         return false;
       }
     } else {
       const levelCap = getLevelCap(clampLevel(levelingInput.startLevel));
       if (clampLevel(levelingInput.startLevel) < 15 && levelingInput.startLevelXp > levelCap) {
-        onValidationWarning(`指挥官起始等级当前经验不能超过该等级上限（${formatXp(levelCap)}）。`);
+        onValidationWarning(t("coop.warn.commanderStartCap").replace("{cap}", formatXp(levelCap)));
         return false;
       }
       const levelTargetCap = getLevelCap(clampLevel(levelingInput.targetLevel));
       if (clampLevel(levelingInput.targetLevel) < 15 && levelingInput.targetLevelXp > levelTargetCap) {
-        onValidationWarning(`指挥官目标等级当前经验不能超过该等级上限（${formatXp(levelTargetCap)}）。`);
+        onValidationWarning(t("coop.warn.commanderTargetCap").replace("{cap}", formatXp(levelTargetCap)));
         return false;
       }
     }
@@ -871,7 +662,7 @@
   let currentMode = "commander";
 
   function renderSyncToggleButton() {
-    return '<button type="button" class="sync-target-xp-btn" data-sync-target-xp-action="true">同步目标经验</button>';
+    return `<button type="button" class="sync-target-xp-btn" data-sync-target-xp-action="true">${t("coop.sync.target")}</button>`;
   }
 
   function applyMode(mode) {
@@ -1147,7 +938,15 @@
     const dayMap = buildDaySummaries(scheduleState.tasks);
     let monthCursor = clampViewDate(scheduleState.viewDate);
     const endMonth = clampViewDate(scheduleState.viewDate);
-    const weekdayNames = ["一", "二", "三", "四", "五", "六", "日"];
+    const weekdayNames = [
+      t("weekday.mon"),
+      t("weekday.tue"),
+      t("weekday.wed"),
+      t("weekday.thu"),
+      t("weekday.fri"),
+      t("weekday.sat"),
+      t("weekday.sun")
+    ];
     const monthBlocks = [];
     const todayKey = dateToInput(new Date());
 
@@ -1175,7 +974,7 @@
           }
           if (!summary) {
             const dayLabel = key === todayKey
-              ? `<div class="calendar-day">${dayNum}<span class="calendar-day-star" aria-label="今天" title="今天">★</span></div>`
+              ? `<div class="calendar-day">${dayNum}<span class="calendar-day-star" aria-label="${t("calendar.today")}" title="${t("calendar.today")}">★</span></div>`
               : `<div class="calendar-day">${dayNum}</div>`;
             weekCells.push([
               '<div class="calendar-cell">',
@@ -1187,40 +986,40 @@
           }
           weekBonusXp += summary.mutationBonusXp;
           const taskTags = summary.tasks.map(function (task) {
-            const typeText = task.taskType === "mutation" ? "突变" : "普通";
-            const difficultyText = DIFFICULTY_LABELS[task.difficulty] || "未知";
-            const randomText = task.randomMapBonus ? "随机" : "固定";
+            const typeText = task.taskType === "mutation" ? t("single.option.mutationTask") : t("single.option.normalTask");
+            const difficultyText = getDifficultyLabel(task.difficulty);
+            const randomText = task.randomMapBonus ? t("calendar.random") : t("calendar.fixed");
             const selectedCls = task.id === scheduleState.selectedTaskId ? " selected" : "";
             const mutationCls = task.taskType === "mutation" ? " mutation" : "";
-            const firstWinText = task.firstWinXp > 0 ? ` + 首胜 ${formatXp(task.firstWinXp)}` : "";
-            const mutationText = task.mutationBonusXp > 0 ? ` + 突变 ${formatXp(task.mutationBonusXp)}` : "";
-            const titleText = `${typeText}/${difficultyText}/${randomText} ${task.games}局`;
+            const firstWinText = task.firstWinXp > 0 ? ` + ${t("calendar.firstWin")} ${formatXp(task.firstWinXp)}` : "";
+            const mutationText = task.mutationBonusXp > 0 ? ` + ${t("calendar.mutation")} ${formatXp(task.mutationBonusXp)}` : "";
+            const titleText = `${typeText} / ${difficultyText} / ${randomText} ${formatGamesCount(task.games)}`;
             return [
               `<div class="task-chip${mutationCls}${selectedCls}" data-select-id="${task.id}">`,
               `<div class="task-chip-content">`,
               `<div class="task-chip-title">${titleText}</div>`,
-              `<div class="task-chip-xp">经验 ${formatXp(task.coreXp)}${firstWinText}${mutationText} = ${formatXp(task.totalXp)}</div>`,
+              `<div class="task-chip-xp">${t("calendar.xpLabel")} ${formatXp(task.coreXp)}${firstWinText}${mutationText} = ${formatXp(task.totalXp)}</div>`,
               "</div>",
-              `<button type="button" class="task-chip-gear-btn" data-edit-id="${task.id}" aria-label="编辑任务">⚙</button>`,
+              `<button type="button" class="task-chip-gear-btn" data-edit-id="${task.id}" aria-label="${t("calendar.editTask")}">⚙</button>`,
               "</div>"
             ].join("");
           }).join("");
           const dayLabel = key === todayKey
-            ? `<div class="calendar-day">${dayNum}<span class="calendar-day-star" aria-label="今天" title="今天">★</span></div>`
+            ? `<div class="calendar-day">${dayNum}<span class="calendar-day-star" aria-label="${t("calendar.today")}" title="${t("calendar.today")}">★</span></div>`
             : `<div class="calendar-day">${dayNum}</div>`;
           weekCells.push([
             '<div class="calendar-cell has-plan">',
             dayLabel,
             `<button type="button" class="calendar-cell-add-btn" data-add-date="${key}">+</button>`,
-            `<div class="calendar-games">${summary.totalGames} 局</div>`,
+            `<div class="calendar-games">${formatGamesCount(summary.totalGames)}</div>`,
             `<div class="calendar-time">${formatDuration(summary.totalMinutes)}</div>`,
-            `<div class="calendar-xp">基础 ${formatXp(summary.baseXp)} + 突变 ${formatXp(summary.mutationBonusXp)} = ${formatXp(summary.totalXp)}</div>`,
+            `<div class="calendar-xp">${t("calendar.base")} ${formatXp(summary.baseXp)} + ${t("calendar.mutation")} ${formatXp(summary.mutationBonusXp)} = ${formatXp(summary.totalXp)}</div>`,
             `<div class="task-chip-list">${taskTags}</div>`,
             "</div>"
           ].join(""));
         }
         const banner = weekBonusXp > 0
-          ? `<div class="calendar-week-mutation">${dateToInput(weekStartDate)} 至 ${dateToInput(weekEndDate)} 突变周奖励 +${formatXp(weekBonusXp)}</div>`
+          ? `<div class="calendar-week-mutation">${dateToInput(weekStartDate)} ${t("common.to")} ${dateToInput(weekEndDate)} ${t("calendar.weekMutationReward")} +${formatXp(weekBonusXp)}</div>`
           : "";
         weekBlocks.push([
           '<div class="calendar-week-block">',
@@ -1250,7 +1049,11 @@
 
   function renderScheduleSummary(targetData) {
     if (!scheduleState.generated) {
-      scheduleSummaryEl.innerHTML = "<p>填写参数并点击“自动规划”。</p>";
+      scheduleSummaryEl.innerHTML = '<p data-i18n="coop.schedule.placeholder"></p>';
+      if (window.SC2I18n && typeof window.SC2I18n.translatePage === "function") {
+        const lang = window.SC2I18n.detectLanguage ? window.SC2I18n.detectLanguage() : "zh";
+        window.SC2I18n.translatePage(lang);
+      }
       return;
     }
     const totalGames = scheduleState.tasks.reduce(function (sum, t) { return sum + t.games; }, 0);
@@ -1262,29 +1065,29 @@
         if (!latest) return task.date;
         return task.date > latest ? task.date : latest;
       }, "")
-      : "未计划";
-    const modeText = targetData.mode === "mastery" ? "精通经验计算" : "指挥官经验计算";
+      : t("calendar.unscheduled");
+    const modeText = targetData.mode === "mastery" ? t("coop.mode.mastery") : t("coop.mode.commander");
     if (scheduleState.targetSource === "manual") {
       scheduleSummaryEl.innerHTML = [
-        `<p><strong>当前模式：</strong>${modeText}</p>`,
-        `<p><strong>当前计划局数：</strong>${totalGames.toLocaleString()} 局</p>`,
-        `<p><strong>当前计划总时长：</strong>${formatDuration(totalMinutes)}</p>`,
-        `<p><strong>预计完成日期：</strong>${completionDate}</p>`,
-        `<p><strong>当前计划总经验：</strong>${formatXp(totalXp)}（含突变奖励 ${formatXp(totalMutationBonus)}）</p>`
+        `<p><strong>${t("calendar.summary.mode")}</strong>${modeText}</p>`,
+        `<p><strong>${t("calendar.summary.games")}</strong>${formatGamesCount(totalGames)}</p>`,
+        `<p><strong>${t("calendar.summary.duration")}</strong>${formatDuration(totalMinutes)}</p>`,
+        `<p><strong>${t("calendar.summary.completion")}</strong>${completionDate}</p>`,
+        `<p><strong>${t("calendar.summary.totalXp")}</strong>${formatXp(totalXp)} (${t("calendar.summary.mutationIncluded")} ${formatXp(totalMutationBonus)})</p>`
       ].join("");
       return;
     }
     const xpDiff = totalXp - scheduleState.targetXp;
     const diffText = xpDiff === 0
-      ? '<span class="ok-text">计划经验与目标一致</span>'
-      : `<span class="warn-text">计划与目标经验差值：${xpDiff > 0 ? "+" : "-"}${formatXp(Math.abs(xpDiff))}</span>`;
+      ? `<span class="ok-text">${t("calendar.summary.matchTarget")}</span>`
+      : `<span class="warn-text">${t("calendar.summary.diff")} ${xpDiff > 0 ? "+" : "-"}${formatXp(Math.abs(xpDiff))}</span>`;
     scheduleSummaryEl.innerHTML = [
-      `<p><strong>当前模式：</strong>${modeText}</p>`,
-      `<p><strong>目标经验：</strong>${formatXp(scheduleState.targetXp)}</p>`,
-      `<p><strong>当前计划局数：</strong>${totalGames.toLocaleString()} 局</p>`,
-      `<p><strong>当前计划总时长：</strong>${formatDuration(totalMinutes)}</p>`,
-      `<p><strong>预计完成日期：</strong>${completionDate}</p>`,
-      `<p><strong>当前计划总经验：</strong>${formatXp(totalXp)}（含突变奖励 ${formatXp(totalMutationBonus)}）</p>`,
+      `<p><strong>${t("calendar.summary.mode")}</strong>${modeText}</p>`,
+      `<p><strong>${t("calendar.summary.targetXp")}</strong>${formatXp(scheduleState.targetXp)}</p>`,
+      `<p><strong>${t("calendar.summary.games")}</strong>${formatGamesCount(totalGames)}</p>`,
+      `<p><strong>${t("calendar.summary.duration")}</strong>${formatDuration(totalMinutes)}</p>`,
+      `<p><strong>${t("calendar.summary.completion")}</strong>${completionDate}</p>`,
+      `<p><strong>${t("calendar.summary.totalXp")}</strong>${formatXp(totalXp)} (${t("calendar.summary.mutationIncluded")} ${formatXp(totalMutationBonus)})</p>`,
       `<p>${diffText}</p>`
     ].join("");
   }
@@ -1449,11 +1252,11 @@
     const scheduleInput = readScheduleInput();
     const autoPlanInput = readAutoPlanInput();
     if (!autoPlanInput.startDate) {
-      window.alert("请选择有效的开始日期。");
+      window.alert(t("alert.selectValidStartDate"));
       return;
     }
     if (!Number.isFinite(scheduleInput.targetXp) || scheduleInput.targetXp <= 0) {
-      window.alert("请输入有效的目标经验（xp，且大于0）。");
+      window.alert(t("alert.enterValidTargetXp"));
       return;
     }
     cancelCoopScheduleDebounce();
@@ -1503,11 +1306,11 @@
     ensureManualScheduleState();
     const value = readEditorFormValue();
     if (!value.date) {
-      window.alert("请选择有效的计划日期。");
+      window.alert(t("alert.selectValidPlanDate"));
       return;
     }
     if (!Number.isFinite(value.games) || value.games <= 0) {
-      window.alert("局数必须大于0。");
+      window.alert(t("alert.gamesMustBePositive"));
       return;
     }
     let analyticsAction = "task_created";
@@ -1586,15 +1389,15 @@
     ensureManualScheduleState();
     const value = readBulkFormValue();
     if (!value.startDate) {
-      window.alert("请选择有效的开始日期。");
+      window.alert(t("alert.selectValidStartDate"));
       return;
     }
     if (!Number.isFinite(value.days) || value.days <= 0) {
-      window.alert("连续天数必须大于0。");
+      window.alert(t("alert.daysMustBePositive"));
       return;
     }
     if (!Number.isFinite(value.gamesPerDay) || value.gamesPerDay <= 0) {
-      window.alert("每日局数必须大于0。");
+      window.alert(t("alert.dailyGamesMustBePositive"));
       return;
     }
     const createdDays = Math.floor(value.days);
@@ -1646,6 +1449,9 @@
 
   function refreshScheduleViews(context) {
     if (!context || !scheduleState.generated) return;
+    const renderStart = (window.performance && typeof window.performance.now === "function")
+      ? window.performance.now()
+      : Date.now();
     syncScheduleMutationRewardSetting(
       !!scheduleState.autoPlanConfig.challengeMutation,
       scheduleState.autoPlanConfig.mutationDifficulty || "savage"
@@ -1653,17 +1459,24 @@
     scheduleState.tasks = recalculateTaskDetails(scheduleState.tasks, DEFAULT_STAGE_RATIO, scheduleState.mutationRewardPerWeek);
     renderScheduleSummary(context.targetData);
     renderScheduleList();
+    const renderEnd = (window.performance && typeof window.performance.now === "function")
+      ? window.performance.now()
+      : Date.now();
+    if (window.SC2Analytics && typeof window.SC2Analytics.trackTiming === "function") {
+      window.SC2Analytics.trackTiming("coop_schedule_refresh", renderEnd - renderStart, {
+        event_label: "schedule_refresh",
+        tasks_count: scheduleState.tasks.length
+      });
+    }
   }
 
   function debouncedRefreshScheduleViews() {
-    cancelCoopScheduleDebounce();
-    coopScheduleDebounceTimer = setTimeout(function () {
-      coopScheduleDebounceTimer = null;
+    scheduleRefreshDebouncer.run(function () {
       const ctx = gatherCurrentContext();
       if (ctx && scheduleState.generated) {
         refreshScheduleViews(ctx);
       }
-    }, COOP_SCHEDULE_DEBOUNCE_MS);
+    });
   }
 
   function refreshAllImmediate() {
@@ -1774,12 +1587,15 @@
   });
   calendarExportIcsBtn.addEventListener("click", function () {
     if (!scheduleState.tasks.length) {
-      window.alert("当前没有可导出的计划任务。");
+      window.alert(t("alert.noTasksToExport"));
       return;
     }
     openExportModal();
   });
   calendarExportConfirmBtn.addEventListener("click", async function () {
+    const exportStart = (window.performance && typeof window.performance.now === "function")
+      ? window.performance.now()
+      : Date.now();
     const options = readExportOptions();
     const suffix = options.scope === "currentMonth"
       ? `${scheduleState.viewDate.getFullYear()}${String(scheduleState.viewDate.getMonth() + 1).padStart(2, "0")}`
@@ -1790,12 +1606,44 @@
       scope: options.scope,
       startTime: options.startTime,
       viewDate: scheduleState.viewDate,
-      difficultyLabels: DIFFICULTY_LABELS,
+      difficultyLabels: Object.keys(DIFFICULTY_I18N_KEYS).reduce(function (acc, key) {
+        acc[key] = getDifficultyLabel(key);
+        return acc;
+      }, {}),
+      texts: {
+        unknown: t("common.unknown"),
+        taskTypeMutation: t("single.option.mutationTask"),
+        taskTypeNormal: t("single.option.normalTask"),
+        gamesUnit: t("calendar.gamesUnit"),
+        randomYes: t("common.yes"),
+        randomNo: t("common.no"),
+        date: t("coop.field.date"),
+        taskType: t("single.form.taskType"),
+        difficulty: t("single.form.difficulty"),
+        games: t("coop.field.games"),
+        randomMapBonus: t("coop.field.randomMapBonus"),
+        baseXp: t("single.result.base"),
+        firstWinXp: t("single.result.firstwin.daily"),
+        mutationBonusXp: t("single.result.mutation"),
+        totalXp: t("calendar.summary.totalXp"),
+        estimatedDuration: t("calendar.summary.duration"),
+        durationMinutes: t("time.minutes"),
+        durationHoursMinutes: t("time.hoursMinutes")
+      },
       filename
     });
     if (!exportResult.ok) {
-      window.alert("所选范围内没有可导出的计划任务。");
+      window.alert(t("alert.noTasksInScope"));
       return;
+    }
+    const exportEnd = (window.performance && typeof window.performance.now === "function")
+      ? window.performance.now()
+      : Date.now();
+    if (window.SC2Analytics && typeof window.SC2Analytics.trackTiming === "function") {
+      window.SC2Analytics.trackTiming("coop_export_ics", exportEnd - exportStart, {
+        event_label: "ics_export",
+        exported_tasks: exportResult.exportedTasks || 0
+      });
     }
     trackAnalyticsEvent("ics_export", {
       export_scope: options.scope,
@@ -1811,7 +1659,7 @@
     closeExportModal();
   });
   calendarClearBtn.addEventListener("click", function () {
-    const ok = window.confirm("确认删除全部计划？此操作不可撤销。");
+    const ok = window.confirm(t("confirm.clearAllTasks"));
     if (!ok) return;
     clearAllTasks();
   });
@@ -1949,4 +1797,7 @@
   refreshXpPanels();
   renderScheduleSummary(null);
   renderScheduleList();
+  window.addEventListener("sc2tool:languagechange", function () {
+    refreshAllImmediate();
+  });
 })();

@@ -8,30 +8,17 @@
     window.SC2Analytics.trackEvent(eventName, params);
   }
 
-  const XP_CONFIG = {
-    baseXp: 20000,
-    objectiveXp: 2000,
-    difficultyBonus: {
-      casual: 0,
-      normal: 0.2,
-      hard: 0.5,
-      brutal: 1.0,
-      brutal1: 1.75,
-      brutal2: 2.0,
-      brutal3: 2.25,
-      brutal4: 2.5,
-      brutal5: 2.75,
-      brutal6: 3.0
-    },
-    randomMapBonus: 0.25,
-    firstWinFlatBonus: 10000,
-    mutationReward: {
-      casual: 25000,
-      normal: 35000,
-      hard: 50000,
-      savage: 75000
+  function t(key) {
+    if (window.SC2I18n && typeof window.SC2I18n.t === "function") {
+      return window.SC2I18n.t(key);
     }
-  };
+    return key;
+  }
+
+  const XP_CONFIG = window.SC2XPData;
+  if (!XP_CONFIG) {
+    return;
+  }
 
   function toPercentText(value) {
     return `${Math.round(value * 100)}%`;
@@ -83,17 +70,19 @@
   }
 
   function renderResult(target, result) {
-    const firstWinText = result.taskType === "mutation" ? "每周首胜经验" : "每日首胜经验";
+    const firstWinText = result.taskType === "mutation"
+      ? t("single.result.firstwin.weekly")
+      : t("single.result.firstwin.daily");
     target.innerHTML = [
-      `<p><strong>每局经验：</strong>${formatXp(result.total)}</p>`,
+      `<p><strong>${t("single.result.total")}</strong>${formatXp(result.total)}</p>`,
       "<ul>",
-      `<li>基础经验：${formatXp(result.breakdown.baseXp)}</li>`,
-      `<li>奖励目标经验：${formatXp(result.breakdown.objectiveXp)}</li>`,
-      `<li>基础合计：${formatXp(result.breakdown.subtotal)}</li>`,
-      `<li>难度加成：${toPercentText(result.breakdown.diffBonus)}</li>`,
-      `<li>随机地图加成：${toPercentText(result.breakdown.randomBonus)}</li>`,
+      `<li>${t("single.result.base")}${formatXp(result.breakdown.baseXp)}</li>`,
+      `<li>${t("single.result.objective")}${formatXp(result.breakdown.objectiveXp)}</li>`,
+      `<li>${t("single.result.subtotal")}${formatXp(result.breakdown.subtotal)}</li>`,
+      `<li>${t("single.result.diff")}${toPercentText(result.breakdown.diffBonus)}</li>`,
+      `<li>${t("single.result.random")}${toPercentText(result.breakdown.randomBonus)}</li>`,
       `<li>${firstWinText}：${formatXp(result.breakdown.firstWin)}</li>`,
-      `<li>突变奖励：${formatXp(result.breakdown.mutationBonus)}</li>`,
+      `<li>${t("single.result.mutation")}${formatXp(result.breakdown.mutationBonus)}</li>`,
       "</ul>"
     ].join("");
   }
@@ -108,7 +97,9 @@
   function syncFirstWinBonusLabel() {
     const taskTypeSelect = form.querySelector('select[name="taskType"]');
     if (!taskTypeSelect) return;
-    firstWinBonusLabel.textContent = taskTypeSelect.value === "mutation" ? "每周首胜" : "每日首胜";
+    firstWinBonusLabel.textContent = taskTypeSelect.value === "mutation"
+      ? t("single.firstwin.weekly")
+      : t("single.firstwin.daily");
   }
 
   function readInput() {
@@ -167,5 +158,6 @@
       event_label: "single_xp"
     });
   });
+  window.addEventListener("sc2tool:languagechange", refresh);
   refresh();
 })();

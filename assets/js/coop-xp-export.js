@@ -65,19 +65,19 @@ function toIcsEventRange(dateText, durationMinutes, startTime) {
   };
 }
 
-function getTaskTypeText(taskType) {
-  return taskType === "mutation" ? "突变任务" : "普通任务";
+function getTaskTypeText(taskType, texts) {
+  return taskType === "mutation" ? texts.taskTypeMutation : texts.taskTypeNormal;
 }
 
 function formatXp(value) {
   return `${Math.round(Number(value) || 0).toLocaleString()} xp`;
 }
 
-function formatDuration(minutes) {
+function formatDuration(minutes, texts) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  if (h <= 0) return `${m}分钟`;
-  return `${h}小时${m}分钟`;
+  if (h <= 0) return texts.durationMinutes.replace("{m}", String(m));
+  return texts.durationHoursMinutes.replace("{h}", String(h)).replace("{m}", String(m));
 }
 
 function getMonthKey(date) {
@@ -100,6 +100,26 @@ function buildIcsContent(tasks, options) {
   const settings = {
     startTime: "20:00",
     difficultyLabels: {},
+    texts: {
+      unknown: "Unknown",
+      taskTypeMutation: "Mutation Mission",
+      taskTypeNormal: "Normal Mission",
+      gamesUnit: "games",
+      randomYes: "Yes",
+      randomNo: "No",
+      date: "Date",
+      taskType: "Task Type",
+      difficulty: "Difficulty",
+      games: "Games",
+      randomMapBonus: "Random Map Bonus",
+      baseXp: "Base XP",
+      firstWinXp: "First Win XP",
+      mutationBonusXp: "Mutation Bonus",
+      totalXp: "Total XP",
+      estimatedDuration: "Estimated Duration",
+      durationMinutes: "{m}m",
+      durationHoursMinutes: "{h}h {m}m"
+    },
     ...options
   };
   const sorted = [...tasks].sort(function (a, b) {
@@ -108,20 +128,20 @@ function buildIcsContent(tasks, options) {
   });
   const events = sorted.map(function (task) {
     const range = toIcsEventRange(task.date, task.estimatedMinutes, settings.startTime);
-    const typeText = getTaskTypeText(task.taskType);
-    const difficultyText = settings.difficultyLabels[task.difficulty] || String(task.difficulty || "未知");
-    const summary = `${typeText} ${difficultyText} ${task.games || 0}局`;
+    const typeText = getTaskTypeText(task.taskType, settings.texts);
+    const difficultyText = settings.difficultyLabels[task.difficulty] || String(task.difficulty || settings.texts.unknown);
+    const summary = `${typeText} ${difficultyText} ${task.games || 0} ${settings.texts.gamesUnit}`;
     const description = [
-      `日期：${task.date || ""}`,
-      `任务类型：${typeText}`,
-      `难度：${difficultyText}`,
-      `局数：${task.games || 0}局`,
-      `随机地图加成：${task.randomMapBonus ? "是" : "否"}`,
-      `基础经验：${formatXp(task.baseXp || 0)}`,
-      `首胜经验：${formatXp(task.firstWinXp || 0)}`,
-      `突变奖励：${formatXp(task.mutationBonusXp || 0)}`,
-      `总经验：${formatXp(task.totalXp || 0)}`,
-      `预计时长：${formatDuration(task.estimatedMinutes || 0)}`
+      `${settings.texts.date}: ${task.date || ""}`,
+      `${settings.texts.taskType}: ${typeText}`,
+      `${settings.texts.difficulty}: ${difficultyText}`,
+      `${settings.texts.games}: ${task.games || 0} ${settings.texts.gamesUnit}`,
+      `${settings.texts.randomMapBonus}: ${task.randomMapBonus ? settings.texts.randomYes : settings.texts.randomNo}`,
+      `${settings.texts.baseXp}: ${formatXp(task.baseXp || 0)}`,
+      `${settings.texts.firstWinXp}: ${formatXp(task.firstWinXp || 0)}`,
+      `${settings.texts.mutationBonusXp}: ${formatXp(task.mutationBonusXp || 0)}`,
+      `${settings.texts.totalXp}: ${formatXp(task.totalXp || 0)}`,
+      `${settings.texts.estimatedDuration}: ${formatDuration(task.estimatedMinutes || 0, settings.texts)}`
     ].join("\n");
     const uid = `${task.id || `task_${Date.now()}`}@sc2tools.local`;
     return [
@@ -165,6 +185,7 @@ export function exportTasksAsIcs(tasks, options) {
     startTime: "20:00",
     viewDate: new Date(),
     difficultyLabels: {},
+    texts: {},
     filename: `coop-plan-${Date.now()}.ics`,
     ...options
   };
@@ -174,7 +195,8 @@ export function exportTasksAsIcs(tasks, options) {
   }
   const content = buildIcsContent(exportingTasks, {
     startTime: settings.startTime,
-    difficultyLabels: settings.difficultyLabels
+    difficultyLabels: settings.difficultyLabels,
+    texts: settings.texts
   });
   downloadIcs(settings.filename, content);
   return { ok: true, exportedTasks: exportingTasks.length, filename: settings.filename };
