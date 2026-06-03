@@ -245,7 +245,7 @@ main#main-content.container {
 }
 
 .invite-api-banner {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.55rem 0.75rem;
@@ -256,6 +256,10 @@ main#main-content.container {
   background: color-mix(in srgb, var(--warn) 12%, transparent);
   color: var(--warn);
   font-size: 0.92rem;
+}
+
+.invite-api-banner:not([hidden]) {
+  display: flex;
 }
 
 .invite-api-banner-text {
