@@ -18,3 +18,6 @@ pnpm-debug.log*
 
 # Dependencies (for future tooling)
 node_modules/
+
+# 组队邀请后端（本地维护，不入版本库）
+invite-service/

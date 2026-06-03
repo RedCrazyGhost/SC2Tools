@@ -163,6 +163,24 @@
   border-color: #7f1d1d;
 }
 
+.calendar-icon-btn--team-share {
+  color: #93c5fd;
+  border-color: #0369a1;
+}
+
+.calendar-icon-btn--team-share:hover,
+.calendar-icon-btn--team-share:focus-visible {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.coop-invite-status-line {
+  min-height: 1.25rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 .calendar-list-header button[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
@@ -429,6 +447,31 @@ body > .calendar-editor-modal {
 
 .auto-plan-toggle-control input[type="checkbox"] {
   margin: 0;
+}
+
+.auto-plan-progress {
+  margin-top: 0.75rem;
+}
+
+.auto-plan-progress-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.auto-plan-progress-track {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.auto-plan-progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  transition: width 0.15s ease-out;
 }
 
 .calendar-week-mutation {

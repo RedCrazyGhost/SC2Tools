@@ -9,7 +9,9 @@ const htmlFiles = [
   "tools/coop-xp.html",
   "tools/commander-xp-table.html",
   "tools/mastery-xp-table.html",
-  "tools/mutation-reward-table.html"
+  "tools/mutation-reward-table.html",
+  "tools/team-invite.html",
+  "tools/invite-view.html"
 ];
 
 const i18nFile = path.join(root, "assets/js/i18n.js");
@@ -42,8 +44,13 @@ for (const file of htmlFiles) {
   }
 }
 
+const seoOptionalFiles = new Set(["tools/invite-view.html"]);
+
 const seoCheck = [];
 for (const file of htmlFiles) {
+  if (seoOptionalFiles.has(file)) {
+    continue;
+  }
   const fullPath = path.join(root, file);
   const content = fs.readFileSync(fullPath, "utf8");
   if (!/property="og:title"[^>]+data-i18n-content=/.test(content)) {

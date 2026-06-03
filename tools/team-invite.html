@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T1FL3L29V3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-T1FL3L29V3');
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="head.teamInvite.title">合作组队匹配 - 星际争霸2工具站</title>
+  <meta name="description" content="为合作模式组队生成分享链接与二维码。" data-i18n-content="head.teamInvite.description">
+  <link rel="canonical" href="https://example.com/tools/team-invite.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="合作组队匹配" data-i18n-content="head.teamInvite.ogTitle">
+  <meta property="og:description" content="生成组队分享链接与二维码。" data-i18n-content="head.teamInvite.ogDescription">
+  <meta property="og:url" content="https://example.com/tools/team-invite.html">
+  <meta name="twitter:card" content="summary">
+  <!-- API 基址：留空则本地开发用 127.0.0.1:8080，生产用 http://154z1z6562.qicp.vip；可填覆盖 -->
+  <meta name="sc2-invite-api-base" content="">
+  <!-- 可选：分享链接使用的静态站域名；留空则用当前页面域名 -->
+  <meta name="sc2-invite-static-base" content="">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/site-suggestion.css">
+  <link rel="stylesheet" href="../assets/css/team-invite.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content" data-i18n="common.skipToContent">跳到主要内容</a>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="logo"><a href="../index.html" data-i18n="site.name">星际争霸2工具站</a></h1>
+      <div class="header-actions">
+        <nav aria-label="主导航" data-i18n-aria-label="aria.mainNav">
+          <ul class="nav-list">
+            <li><a href="./single-xp.html" data-i18n="nav.single">单局经验计算器</a></li>
+            <li><a href="./coop-xp.html" data-i18n="nav.coop">合作练级日历</a></li>
+            <li><a href="./team-invite.html" aria-current="page" data-i18n="nav.teamInvite">组队匹配</a></li>
+          </ul>
+        </nav>
+        <a class="github-link" href="https://github.com/RedCrazyGhost/SC2Tools" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.59 2 12.25c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.5 0-.24-.01-1.05-.01-1.9-2.78.62-3.37-1.22-3.37-1.22-.46-1.2-1.11-1.53-1.11-1.53-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.35 1.12 2.92.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.74-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.75c.85 0 1.71.12 2.51.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.71 1.03 1.62 1.03 2.74 0 3.95-2.34 4.82-4.57 5.07.36.32.67.95.67 1.92 0 1.38-.01 2.5-.01 2.84 0 .28.18.61.69.5A10.27 10.27 0 0 0 22 12.25C22 6.59 17.52 2 12 2Z"/>
+          </svg>
+        </a>
+        <div class="lang-switcher lang-toggle" role="group" data-i18n-aria-label="aria.languageSwitcher" aria-label="语言切换">
+          <button type="button" class="lang-toggle-btn" data-lang-switch="zh" data-i18n="lang.zh" aria-pressed="true">中文</button>
+          <span class="lang-toggle-sep" aria-hidden="true">/</span>
+          <button type="button" class="lang-toggle-btn" data-lang-switch="en" data-i18n="lang.en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="container">
+    <nav class="breadcrumb" aria-label="面包屑" data-i18n-aria-label="aria.breadcrumb">
+      <a href="../index.html" data-i18n="common.home">首页</a> / <span data-i18n="teamInvite.breadcrumb">组队匹配</span>
+    </nav>
+
+    <section class="card team-invite-panel">
+      <header class="team-invite-panel-head">
+        <h2 data-i18n="teamInvite.title">合作组队匹配</h2>
+        <p id="teamInviteIntro" class="team-invite-lead"></p>
+      </header>
+      <div class="team-invite-panel-toolbar">
+        <div class="team-invite-toolbar-row">
+          <button type="button" id="openInviteModal" class="team-invite-toolbar-btn btn-team-invite-primary">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span data-i18n="teamInvite.create">发起邀请</span>
+          </button>
+          <button type="button" id="refreshBtn" class="team-invite-toolbar-btn team-invite-toolbar-btn--secondary">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08a5.99 5.99 0 0 1-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35Z"/>
+            </svg>
+            <span data-i18n="teamInvite.refresh">刷新列表</span>
+          </button>
+        </div>
+        <p id="statusLine" class="team-invite-page-status" aria-live="polite"></p>
+      </div>
+      <div class="team-invite-panel-body">
+        <div id="inviteList" class="team-invite-list" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="inviteModal" class="team-invite-modal" hidden>
+    <div class="team-invite-modal-backdrop" data-close-invite-modal tabindex="-1"></div>
+    <div
+      class="team-invite-modal-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="inviteModalTitle"
+    >
+      <header class="team-invite-modal-header">
+        <h3 id="inviteModalTitle" data-i18n="teamInvite.modalTitle">发起邀请</h3>
+        <button
+          type="button"
+          class="team-invite-modal-close"
+          data-close-invite-modal
+          data-i18n-aria-label="aria.closeInviteModal"
+          aria-label="关闭"
+        >&times;</button>
+      </header>
+      <p id="modalStatusLine" class="team-invite-modal-status" aria-live="polite"></p>
+      <div id="inviteModalFormWrap">
+        <p class="team-invite-modal-hint" data-i18n="teamInvite.modalHint">填写后提交即可生成分享链接与二维码。</p>
+        <form id="inviteModalForm" class="form-grid team-invite-modal-form" onsubmit="return false;">
+        <label>
+          <span data-i18n="teamInvite.inviteTitleLabel">邀请标题</span>
+          <input id="inviteTitle" name="inviteTitle" maxlength="80" data-i18n-placeholder="teamInvite.inviteTitlePlaceholder" placeholder="例如：周末突变组队">
+          <span class="team-invite-field-hint" data-i18n="teamInvite.inviteTitleHint">1～80 字，将显示在邀请卡片与公开页顶部。</span>
+        </label>
+        <label>
+          <span data-i18n="teamInvite.blizzardId">暴雪战网 ID</span>
+          <input id="blizzardId" name="blizzardId" maxlength="18" autocomplete="username" data-i18n-placeholder="teamInvite.blizzardIdPlaceholder" placeholder="示例：PlayerName#1234">
+        </label>
+        <label>
+          <span data-i18n="teamInvite.note">说明（可选）</span>
+          <textarea id="note" name="note" rows="2" maxlength="250" aria-describedby="noteHint"></textarea>
+          <span id="noteHint" class="team-invite-field-hint" data-i18n="teamInvite.noteHint">最多 250 字。</span>
+        </label>
+        <label class="team-invite-span-full">
+          <span data-i18n="teamInvite.expiresAtLabel">截止时间</span>
+          <input id="inviteExpiresAt" name="inviteExpiresAt" type="datetime-local" step="60" aria-describedby="inviteExpiresAtHint">
+          <span id="inviteExpiresAtHint" class="team-invite-field-hint" data-i18n="teamInvite.expiresAtHint">须为未来时间，最多 30 天内（默认 3 天后）。到期后邀请将从服务器删除，链接失效。</span>
+        </label>
+        <div class="team-invite-span-full team-invite-calendar-option">
+          <label class="team-invite-inline-checkbox">
+            <input type="checkbox" id="includeInvitePoster" name="includeInvitePoster" value="protoss-want-you" />
+            <span data-i18n="teamInvite.includePoster">使用 Protoss 招募海报</span>
+          </label>
+          <p class="team-invite-field-hint" data-i18n="teamInvite.includePosterHint">开启后，分享页顶部会显示招募风格海报图。</p>
+        </div>
+        <div class="team-invite-modal-actions">
+          <button type="button" id="modalCancelBtn" data-i18n="common.cancel">取消</button>
+          <button type="button" id="modalSubmitInvite" class="btn-team-invite-primary" data-i18n="teamInvite.modalSubmit">确定</button>
+        </div>
+        </form>
+      </div>
+      <div id="inviteModalResult" class="team-invite-modal-result" hidden>
+        <p><strong data-i18n="teamInvite.shortUrl">分享链接</strong>：<a id="resultLink" href="#" rel="noopener noreferrer" target="_blank"></a></p>
+        <p><strong data-i18n="teamInvite.qr">二维码</strong></p>
+        <div id="qrWrap"></div>
+        <p id="resultExpiresLine" hidden><strong data-i18n="teamInvite.resultExpires">有效期至：</strong><span id="resultExpiresValue"></span></p>
+        <div class="team-invite-modal-actions">
+          <button type="button" id="modalDoneBtn" class="btn-team-invite-primary" data-i18n="teamInvite.modalDone">完成</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p data-i18n="site.footer">© 2026 星际争霸2工具站</p>
+    </div>
+  </footer>
+  <script defer src="../assets/js/analytics-config.js"></script>
+  <script defer src="../assets/js/analytics.js"></script>
+  <script defer src="../assets/js/qrcode.min.js"></script>
+  <script defer src="../assets/js/i18n.js"></script>
+  <script defer src="../assets/js/invite-api-health.js"></script>
+  <script defer src="../assets/js/site-suggestion.js"></script>
+  <script defer src="../assets/js/invite-validate.js"></script>
+  <script defer src="../assets/js/invite-url.js"></script>
+  <script defer src="../assets/js/team-invite.js"></script>
+</body>
+</html>

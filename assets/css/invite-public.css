@@ -1,0 +1,456 @@
+/* 组队邀请公开展示页（tools/invite-view.html）：邀请内容区样式，壳层由 main.css 提供。 */
+
+.invite-pub-card {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.35rem 1.4rem 1.5rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* 左侧固定栏：默认仅露出海报右侧 20px，点击图标展开或收起 */
+.invite-view-main--has-poster {
+  position: relative;
+}
+
+.invite-pub-poster-rail {
+  position: fixed;
+  left: 0;
+  top: 4.2rem;
+  bottom: var(--site-footer-height);
+  display: flex;
+  flex-direction: column;
+  width: 20px;
+  z-index: 8;
+  overflow: visible;
+  border-right: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.72);
+  container-type: inline-size;
+}
+
+.invite-pub-poster-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.invite-pub-poster-rail.is-expanded .invite-pub-poster-viewport {
+  overflow: visible;
+}
+
+.invite-pub-poster-rail .invite-pub-poster {
+  display: block;
+  width: max-content;
+  max-width: none;
+  min-height: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  /* 整图左移，视口内仅保留最右侧 100cqw（20px） */
+  transform: translateX(calc(100cqw - 100%));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.55s ease;
+  will-change: transform;
+}
+
+.invite-pub-poster-rail .invite-pub-poster-img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  object-fit: contain;
+  object-position: right center;
+  background: rgba(15, 23, 42, 0.45);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.invite-pub-poster-rail-toggle {
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0.35rem 0 0.55rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(15, 23, 42, 0.92);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.invite-pub-poster-rail-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: block;
+  fill: currentColor;
+}
+
+.invite-pub-poster-rail-toggle:hover,
+.invite-pub-poster-rail-toggle:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+.invite-pub-poster-rail.is-expanded {
+  overflow: visible;
+  z-index: 20;
+}
+
+.invite-pub-poster-rail.is-expanded .invite-pub-poster {
+  transform: translateX(0);
+  box-shadow: 12px 0 36px rgba(0, 0, 0, 0.48);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invite-pub-poster-rail .invite-pub-poster {
+    transition: none;
+  }
+}
+
+.invite-pub-disclaimer {
+  margin: 1.15rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.invite-pub-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.15rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.invite-pub-head-main {
+  min-width: 0;
+}
+
+.invite-pub-head-qr {
+  text-align: center;
+  padding: 0.35rem 0.5rem 0.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.invite-pub-head-qr .invite-pub-qr-wrap {
+  margin: 0;
+}
+
+.invite-pub-head-qr .invite-pub-qr-wrap canvas {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.invite-pub-title {
+  margin: 0 0 0.65rem;
+  font-size: 1.45rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.invite-pub-btag {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.invite-pub-btag strong {
+  color: var(--muted);
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+
+.invite-pub-btag span {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.invite-pub-head-main .invite-pub-note {
+  margin: 0.75rem 0 0;
+}
+
+.invite-pub-note {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.55);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.invite-pub-note-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.invite-pub-section {
+  margin-bottom: 1.1rem;
+}
+
+.invite-pub-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.invite-pub-foot {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.invite-pub-meta {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.invite-pub-meta + .invite-pub-meta {
+  margin-top: 0.35rem;
+}
+
+.invite-pub-share-block {
+  margin-bottom: 0.85rem;
+}
+
+.invite-pub-qr-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.invite-pub-qr-label strong {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.invite-pub-share-line {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.invite-pub-share-line a {
+  color: var(--accent);
+}
+
+.invite-pub-qr-wrap {
+  margin: 0 0 1rem;
+  min-height: 2rem;
+}
+
+.invite-pub-qr-wrap canvas {
+  display: block;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.invite-pub-card--msg .invite-pub-title {
+  margin-bottom: 0.65rem;
+}
+
+.invite-pub-msg {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.invite-pub-card--gone .invite-pub-title {
+  color: var(--warn);
+}
+
+.invite-pub-card--missing .invite-pub-title {
+  color: var(--danger);
+}
+
+.invite-pub-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.invite-pub-section-head .invite-pub-section-title {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.invite-pub-calendar-host {
+  margin: 0;
+}
+
+/* 合作任务日历预览（只读，复用 coop-xp 月历样式） */
+.invite-pub-calendar-wrap {
+  margin-top: 0;
+}
+
+.invite-pub-cal-nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.invite-pub-cal-nav-core {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.invite-pub-cal-nav > .invite-pub-cal-download-btn {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.invite-pub-cal-nav-title {
+  flex: 0 1 auto;
+  min-width: 8rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 2.25rem;
+  color: var(--heading);
+}
+
+.invite-pub-cal-nav-btn,
+.invite-pub-cal-download-btn {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  margin-top: 0;
+}
+
+.invite-pub-cal-nav-btn svg,
+.invite-pub-cal-download-btn svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: currentColor;
+  display: block;
+}
+
+.invite-pub-cal-download-btn {
+  color: #93c5fd;
+  border-color: #0369a1;
+}
+
+.invite-pub-cal-download-btn:hover,
+.invite-pub-cal-download-btn:focus-visible {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.invite-pub-calendar-root .calendar-month {
+  margin: 0;
+}
+
+.invite-pub-calendar-root .calendar-month-head .calendar-title {
+  display: none;
+}
+
+.invite-pub-calendar-root .calendar-weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.5rem;
+}
+
+.invite-pub-calendar-root .calendar-cell {
+  align-items: center;
+  text-align: center;
+  padding: 0.4rem 0.35rem 0.35rem;
+}
+
+.invite-pub-calendar-root .calendar-day {
+  justify-content: center;
+  width: 100%;
+}
+
+.invite-pub-calendar-root .calendar-day-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.85rem;
+  height: 0.85rem;
+  line-height: 1;
+}
+
+.invite-pub-calendar-root .calendar-games,
+.invite-pub-calendar-root .calendar-time {
+  width: 100%;
+  text-align: center;
+}
+
+.invite-pub-calendar-root .task-chip-list {
+  width: 100%;
+}
+
+.invite-pub-calendar-root .task-chip {
+  justify-content: center;
+  text-align: center;
+  cursor: default;
+}
+
+.invite-pub-calendar-root .task-chip-content {
+  width: 100%;
+  text-align: center;
+}
+
+.invite-pub-calendar-root .calendar-cell-add-btn,
+.invite-pub-calendar-root .task-chip-gear-btn {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .invite-pub-poster-rail {
+    top: 3.8rem;
+  }
+
+  .invite-pub-head {
+    grid-template-columns: 1fr;
+  }
+
+  .invite-pub-head-qr {
+    justify-self: center;
+    max-width: 12.5rem;
+  }
+
+  .invite-pub-calendar-root .calendar-grid,
+  .invite-pub-calendar-root .calendar-weekdays {
+    gap: 0.3rem;
+  }
+
+  .invite-pub-calendar-root .calendar-cell {
+    min-height: 72px;
+  }
+}

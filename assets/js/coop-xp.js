@@ -92,6 +92,12 @@
   const calendarAutoPlanForm = document.getElementById("calendar-auto-plan-form");
   const calendarAutoPlanGenerateBtn = document.getElementById("calendar-auto-plan-generate-btn");
   const calendarAutoPlanCancelBtn = document.getElementById("calendar-auto-plan-cancel-btn");
+  const calendarAutoPlanProgressEl = document.getElementById("calendar-auto-plan-progress");
+  const calendarAutoPlanProgressLabelEl = document.getElementById("calendar-auto-plan-progress-label");
+  const calendarAutoPlanProgressBarEl = document.getElementById("calendar-auto-plan-progress-bar");
+  const calendarAutoPlanProgressTrackEl = calendarAutoPlanProgressEl
+    ? calendarAutoPlanProgressEl.querySelector(".auto-plan-progress-track")
+    : null;
   const calendarExportModal = document.getElementById("calendar-export-modal");
   const calendarExportForm = document.getElementById("calendar-export-form");
   const calendarExportConfirmBtn = document.getElementById("calendar-export-confirm-btn");
@@ -102,6 +108,7 @@
   const calendarPrevMonthBtn = document.getElementById("calendar-prev-month-btn");
   const calendarNextMonthBtn = document.getElementById("calendar-next-month-btn");
   const calendarTodayBtn = document.getElementById("calendar-today-btn");
+  const calendarTeamShareBtn = document.getElementById("calendar-team-share-btn");
   const calendarToolbarNav = document.querySelector(".calendar-toolbar-nav");
 
   if (
@@ -130,6 +137,10 @@
     !calendarAutoPlanForm ||
     !calendarAutoPlanGenerateBtn ||
     !calendarAutoPlanCancelBtn ||
+    !calendarAutoPlanProgressEl ||
+    !calendarAutoPlanProgressLabelEl ||
+    !calendarAutoPlanProgressBarEl ||
+    !calendarAutoPlanProgressTrackEl ||
     !calendarExportModal ||
     !calendarExportForm ||
     !calendarExportConfirmBtn ||
@@ -175,6 +186,14 @@
     settle: 20
   };
 
+  const AUTO_PLAN_BUILD_WEIGHT = 0.65;
+  const AUTO_PLAN_OPTIMIZE_WEIGHT = 0.35;
+  const AUTO_PLAN_MAX_BUILD_GUARD = 4000;
+  const AUTO_PLAN_MAX_OPTIMIZE_GUARD = 4000;
+  const AUTO_PLAN_YIELD_EVERY = 12;
+
+  let autoPlanGenerating = false;
+
   const DIFFICULTY_I18N_KEYS = {
     casual: "difficulty.casual",
     normal: "difficulty.normal",
@@ -215,6 +234,66 @@
     }
     return coopExportModulePromise;
   }
+
+  function buildCalendarIcsTexts() {
+    return {
+      unknown: t("common.unknown"),
+      taskTypeMutation: t("single.option.mutationTask"),
+      taskTypeNormal: t("single.option.normalTask"),
+      gamesUnit: t("calendar.gamesUnit"),
+      randomYes: t("common.yes"),
+      randomNo: t("common.no"),
+      date: t("coop.field.date"),
+      taskType: t("single.form.taskType"),
+      difficulty: t("single.form.difficulty"),
+      games: t("coop.field.games"),
+      randomMapBonus: t("coop.field.randomMapBonus"),
+      baseXp: t("single.result.base"),
+      firstWinXp: t("single.result.firstwin.daily"),
+      mutationBonusXp: t("single.result.mutation"),
+      totalXp: t("calendar.summary.totalXp"),
+      estimatedDuration: t("calendar.summary.duration"),
+      durationMinutes: t("time.minutes"),
+      durationHoursMinutes: t("time.hoursMinutes")
+    };
+  }
+
+  function buildCalendarIcsDifficultyLabels() {
+    return Object.keys(DIFFICULTY_I18N_KEYS).reduce(function (acc, key) {
+      acc[key] = getDifficultyLabel(key);
+      return acc;
+    }, {});
+  }
+
+  /**
+   * 供组队邀请提交：仅传任务与导出参数（JSON），不在请求体中携带整段 ICS。
+   * 公开邀请页会据此重算并下载日历。
+   */
+  window.sc2CoopGetCalendarPlanPayload = function () {
+    if (!scheduleState.tasks.length) {
+      return null;
+    }
+    let tasks;
+    try {
+      tasks = JSON.parse(JSON.stringify(scheduleState.tasks));
+    } catch (e) {
+      return null;
+    }
+    const vd =
+      scheduleState.viewDate instanceof Date
+        ? scheduleState.viewDate.toISOString()
+        : String(scheduleState.viewDate || "");
+    return {
+      tasks,
+      export: {
+        scope: "all",
+        startTime: "20:00",
+        viewDate: vd,
+        texts: buildCalendarIcsTexts(),
+        difficultyLabels: buildCalendarIcsDifficultyLabels()
+      }
+    };
+  };
 
   function cancelCoopScheduleDebounce() {
     scheduleRefreshDebouncer.cancel();
@@ -810,6 +889,7 @@
   }
 
   function openAutoPlanModal(defaultDate) {
+    resetAutoPlanProgress();
     const startDateInput = calendarAutoPlanForm.querySelector('input[name="autoPlanStartDate"]');
     const dailyInput = calendarAutoPlanForm.querySelector('input[name="autoPlanDailyNormalGames"]');
     const difficultySelect = calendarAutoPlanForm.querySelector('select[name="autoPlanDifficulty"]');
@@ -838,7 +918,46 @@
   }
 
   function closeAutoPlanModal() {
+    if (autoPlanGenerating) return;
     calendarAutoPlanModal.hidden = true;
+    resetAutoPlanProgress();
+  }
+
+  function yieldToUi() {
+    return new Promise(function (resolve) {
+      window.requestAnimationFrame(function () {
+        window.setTimeout(resolve, 0);
+      });
+    });
+  }
+
+  function resetAutoPlanProgress() {
+    calendarAutoPlanProgressEl.hidden = true;
+    calendarAutoPlanProgressBarEl.style.width = "0%";
+    calendarAutoPlanProgressTrackEl.setAttribute("aria-valuenow", "0");
+  }
+
+  function setAutoPlanProgress(ratio, phase) {
+    const percent = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+    calendarAutoPlanProgressEl.hidden = false;
+    calendarAutoPlanProgressBarEl.style.width = percent + "%";
+    calendarAutoPlanProgressTrackEl.setAttribute("aria-valuenow", String(percent));
+    const key = phase === "optimizing"
+      ? "coop.modal.autoPlan.progressOptimizing"
+      : "coop.modal.autoPlan.progressBuilding";
+    calendarAutoPlanProgressLabelEl.textContent = t(key).replace("{percent}", String(percent));
+  }
+
+  function setAutoPlanGenerating(active) {
+    autoPlanGenerating = active;
+    calendarAutoPlanGenerateBtn.disabled = active;
+    calendarAutoPlanCancelBtn.disabled = active;
+    calendarAutoPlanForm.querySelectorAll("input, select, button").forEach(function (element) {
+      if (element === calendarAutoPlanGenerateBtn || element === calendarAutoPlanCancelBtn) {
+        return;
+      }
+      element.disabled = active;
+    });
   }
 
   function openExportModal() {
@@ -1148,51 +1267,12 @@
     return [...sortedNormal, ...mutationTasks];
   }
 
-  function buildTasksByTargetXp(startDate, targetXp, dailyGamesTarget, difficulty, randomMapBonus, challengeMutation, mutationDifficulty, mutationRewardPerWeek) {
-    if (targetXp <= 0) return [];
-    const estimatedGames = Math.max(1, Math.ceil(targetXp / Math.max(1, calculatePerGameXpByConfig(difficulty, randomMapBonus))));
-    let tasks = distributeTemplateTasks(startDate, estimatedGames, dailyGamesTarget, difficulty, randomMapBonus);
-    if (challengeMutation) {
-      tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
-    }
-    tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
-    if (tasks.length <= 0) {
-      tasks = [createTask(dateToInput(startDate), 1, "normal", difficulty, randomMapBonus)];
-      if (challengeMutation) {
-        tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
-      }
-      tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
-    }
-    let totalXp = sumTotalXp(tasks);
-    let guard = 0;
-    while (totalXp < targetXp && guard < 4000) {
-      const lastIndex = tasks.length - 1;
-      if (lastIndex < 0) {
-        const nextDate = dateToInput(addDays(startDate, tasks.length));
-        tasks.push(createTask(nextDate, dailyGamesTarget, "normal", difficulty, randomMapBonus));
-      } else if (tasks[lastIndex].games < dailyGamesTarget * 2) {
-        tasks[lastIndex].games += 1;
-      } else {
-        const nextDate = dateToInput(addDays(startDate, tasks.length));
-        tasks.push(createTask(nextDate, dailyGamesTarget, "normal", difficulty, randomMapBonus));
-      }
-      if (challengeMutation) {
-        tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
-      }
-      tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
-      totalXp = sumTotalXp(tasks);
-      guard += 1;
-    }
-    tasks = optimizeTasksForTargetXp(tasks, targetXp, challengeMutation, mutationDifficulty, mutationRewardPerWeek);
-    return tasks;
-  }
-
-  function optimizeTasksForTargetXp(tasks, targetXp, challengeMutation, mutationDifficulty, mutationRewardPerWeek) {
+  async function optimizeTasksForTargetXpAsync(tasks, targetXp, challengeMutation, mutationDifficulty, mutationRewardPerWeek, onProgress) {
     let working = [...tasks];
     if (working.length <= 0) return working;
     let improved = true;
     let guard = 0;
-    while (improved && guard < 4000) {
+    while (improved && guard < AUTO_PLAN_MAX_OPTIMIZE_GUARD) {
       improved = false;
       guard += 1;
       const normalIndexes = [];
@@ -1221,8 +1301,64 @@
           break;
         }
       }
+      if (guard % AUTO_PLAN_YIELD_EVERY === 0) {
+        const optimizeRatio = Math.min(1, guard / AUTO_PLAN_MAX_OPTIMIZE_GUARD);
+        await onProgress(AUTO_PLAN_BUILD_WEIGHT + optimizeRatio * AUTO_PLAN_OPTIMIZE_WEIGHT, "optimizing");
+      }
     }
     return working;
+  }
+
+  async function buildTasksByTargetXpAsync(startDate, targetXp, dailyGamesTarget, difficulty, randomMapBonus, challengeMutation, mutationDifficulty, mutationRewardPerWeek, onProgress) {
+    if (targetXp <= 0) return [];
+    const estimatedGames = Math.max(1, Math.ceil(targetXp / Math.max(1, calculatePerGameXpByConfig(difficulty, randomMapBonus))));
+    let tasks = distributeTemplateTasks(startDate, estimatedGames, dailyGamesTarget, difficulty, randomMapBonus);
+    if (challengeMutation) {
+      tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
+    }
+    tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
+    if (tasks.length <= 0) {
+      tasks = [createTask(dateToInput(startDate), 1, "normal", difficulty, randomMapBonus)];
+      if (challengeMutation) {
+        tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
+      }
+      tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
+    }
+    let totalXp = sumTotalXp(tasks);
+    let guard = 0;
+    await onProgress(Math.min(1, totalXp / targetXp) * AUTO_PLAN_BUILD_WEIGHT, "building");
+    while (totalXp < targetXp && guard < AUTO_PLAN_MAX_BUILD_GUARD) {
+      const lastIndex = tasks.length - 1;
+      if (lastIndex < 0) {
+        const nextDate = dateToInput(addDays(startDate, tasks.length));
+        tasks.push(createTask(nextDate, dailyGamesTarget, "normal", difficulty, randomMapBonus));
+      } else if (tasks[lastIndex].games < dailyGamesTarget * 2) {
+        tasks[lastIndex].games += 1;
+      } else {
+        const nextDate = dateToInput(addDays(startDate, tasks.length));
+        tasks.push(createTask(nextDate, dailyGamesTarget, "normal", difficulty, randomMapBonus));
+      }
+      if (challengeMutation) {
+        tasks = appendWeeklyMutationTasks(tasks, mutationDifficulty);
+      }
+      tasks = recalculateTaskDetails(tasks, DEFAULT_STAGE_RATIO, mutationRewardPerWeek);
+      totalXp = sumTotalXp(tasks);
+      guard += 1;
+      if (guard % AUTO_PLAN_YIELD_EVERY === 0) {
+        const buildRatio = Math.min(1, totalXp / targetXp);
+        await onProgress(buildRatio * AUTO_PLAN_BUILD_WEIGHT, "building");
+      }
+    }
+    tasks = await optimizeTasksForTargetXpAsync(
+      tasks,
+      targetXp,
+      challengeMutation,
+      mutationDifficulty,
+      mutationRewardPerWeek,
+      onProgress
+    );
+    await onProgress(1, "optimizing");
+    return tasks;
   }
 
   function gatherCurrentContext() {
@@ -1246,7 +1382,8 @@
     };
   }
 
-  function generateSchedule() {
+  async function generateSchedule() {
+    if (autoPlanGenerating) return;
     const context = gatherCurrentContext();
     if (!context) return;
     const scheduleInput = readScheduleInput();
@@ -1272,16 +1409,27 @@
       mutationDifficulty: autoPlanInput.mutationDifficulty
     };
     syncScheduleMutationRewardSetting(autoPlanInput.challengeMutation, autoPlanInput.mutationDifficulty);
-    scheduleState.tasks = buildTasksByTargetXp(
-      autoPlanInput.startDate,
-      scheduleState.targetXp,
-      autoPlanInput.dailyNormalGames,
-      autoPlanInput.difficulty,
-      autoPlanInput.randomMapBonus,
-      autoPlanInput.challengeMutation,
-      autoPlanInput.mutationDifficulty,
-      scheduleState.mutationRewardPerWeek
-    );
+    setAutoPlanGenerating(true);
+    setAutoPlanProgress(0, "building");
+    try {
+      scheduleState.tasks = await buildTasksByTargetXpAsync(
+        autoPlanInput.startDate,
+        scheduleState.targetXp,
+        autoPlanInput.dailyNormalGames,
+        autoPlanInput.difficulty,
+        autoPlanInput.randomMapBonus,
+        autoPlanInput.challengeMutation,
+        autoPlanInput.mutationDifficulty,
+        scheduleState.mutationRewardPerWeek,
+        async function (ratio, phase) {
+          setAutoPlanProgress(ratio, phase);
+          await yieldToUi();
+        }
+      );
+    } finally {
+      setAutoPlanGenerating(false);
+      resetAutoPlanProgress();
+    }
     scheduleState.targetGames = scheduleState.tasks.reduce(function (sum, task) { return sum + task.games; }, 0);
     scheduleState.selectedTaskId = null;
     scheduleState.viewDate = clampViewDate(autoPlanInput.startDate);
@@ -1577,7 +1725,7 @@
     openAutoPlanModal(scheduleState.viewDate);
   });
   calendarAutoPlanGenerateBtn.addEventListener("click", function () {
-    generateSchedule();
+    void generateSchedule();
   });
   calendarAutoPlanCancelBtn.addEventListener("click", function () {
     closeAutoPlanModal();
@@ -1606,30 +1754,8 @@
       scope: options.scope,
       startTime: options.startTime,
       viewDate: scheduleState.viewDate,
-      difficultyLabels: Object.keys(DIFFICULTY_I18N_KEYS).reduce(function (acc, key) {
-        acc[key] = getDifficultyLabel(key);
-        return acc;
-      }, {}),
-      texts: {
-        unknown: t("common.unknown"),
-        taskTypeMutation: t("single.option.mutationTask"),
-        taskTypeNormal: t("single.option.normalTask"),
-        gamesUnit: t("calendar.gamesUnit"),
-        randomYes: t("common.yes"),
-        randomNo: t("common.no"),
-        date: t("coop.field.date"),
-        taskType: t("single.form.taskType"),
-        difficulty: t("single.form.difficulty"),
-        games: t("coop.field.games"),
-        randomMapBonus: t("coop.field.randomMapBonus"),
-        baseXp: t("single.result.base"),
-        firstWinXp: t("single.result.firstwin.daily"),
-        mutationBonusXp: t("single.result.mutation"),
-        totalXp: t("calendar.summary.totalXp"),
-        estimatedDuration: t("calendar.summary.duration"),
-        durationMinutes: t("time.minutes"),
-        durationHoursMinutes: t("time.hoursMinutes")
-      },
+      difficultyLabels: buildCalendarIcsDifficultyLabels(),
+      texts: buildCalendarIcsTexts(),
       filename
     });
     if (!exportResult.ok) {
@@ -1672,6 +1798,13 @@
   calendarTodayBtn.addEventListener("click", function () {
     goToday();
   });
+  if (calendarTeamShareBtn) {
+    calendarTeamShareBtn.addEventListener("click", function () {
+      if (typeof window.sc2OpenTeamInviteModal === "function") {
+        window.sc2OpenTeamInviteModal();
+      }
+    });
+  }
   calendarEditorSaveBtn.addEventListener("click", function () {
     saveTaskFromEditor();
   });

@@ -21,6 +21,9 @@
   <meta property="og:url" content="https://example.com/">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/site-suggestion.css">
+  <!-- API 基址：留空则本地开发用 127.0.0.1:8080，生产用 http://154z1z6562.qicp.vip；可填覆盖 -->
+  <meta name="sc2-invite-api-base" content="">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -62,6 +65,7 @@
           <ul class="nav-list">
             <li><a href="tools/single-xp.html" data-i18n="nav.single">单局经验计算器</a></li>
             <li><a href="tools/coop-xp.html" data-i18n="nav.coop">合作练级日历</a></li>
+            <li><a href="tools/team-invite.html" data-i18n="nav.teamInvite">组队匹配</a></li>
           </ul>
         </nav>
         <a class="github-link" href="https://github.com/RedCrazyGhost/SC2Tools" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository" title="GitHub">
@@ -69,12 +73,10 @@
             <path d="M12 2C6.48 2 2 6.59 2 12.25c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.5 0-.24-.01-1.05-.01-1.9-2.78.62-3.37-1.22-3.37-1.22-.46-1.2-1.11-1.53-1.11-1.53-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.35 1.12 2.92.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.74-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.75c.85 0 1.71.12 2.51.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.71 1.03 1.62 1.03 2.74 0 3.95-2.34 4.82-4.57 5.07.36.32.67.95.67 1.92 0 1.38-.01 2.5-.01 2.84 0 .28.18.61.69.5A10.27 10.27 0 0 0 22 12.25C22 6.59 17.52 2 12 2Z"/>
           </svg>
         </a>
-        <div class="lang-switcher" aria-label="language switcher" data-i18n-aria-label="aria.languageSwitcher">
-          <label for="lang-select-index" data-i18n="lang.switcher.label">语言</label>
-          <select id="lang-select-index" data-lang-select>
-            <option value="zh" data-i18n="lang.zh">中文</option>
-            <option value="en" data-i18n="lang.en">EN</option>
-          </select>
+        <div class="lang-switcher lang-toggle" role="group" data-i18n-aria-label="aria.languageSwitcher" aria-label="语言切换">
+          <button type="button" class="lang-toggle-btn" data-lang-switch="zh" data-i18n="lang.zh" aria-pressed="true">中文</button>
+          <span class="lang-toggle-sep" aria-hidden="true">/</span>
+          <button type="button" class="lang-toggle-btn" data-lang-switch="en" data-i18n="lang.en" aria-pressed="false">EN</button>
         </div>
       </div>
     </div>
@@ -109,6 +111,10 @@
           <h3><a href="tools/mutation-reward-table.html" data-i18n="index.card.mutation.title">每周突变奖励经验列表</a></h3>
           <p data-i18n="index.card.mutation.desc">查看休闲到残酷各档突变奖励经验与累积奖励。</p>
         </article>
+        <article class="card">
+          <h3><a href="tools/team-invite.html" data-i18n="index.card.teamInvite.title">合作组队匹配</a></h3>
+          <p data-i18n="index.card.teamInvite.desc">创建组队匹配分享链接与二维码。</p>
+        </article>
       </div>
     </section>
 
@@ -129,5 +135,8 @@
   <script defer src="assets/js/analytics-config.js"></script>
   <script defer src="assets/js/analytics.js"></script>
   <script defer src="assets/js/i18n.js"></script>
+  <script defer src="assets/js/invite-url.js"></script>
+  <script defer src="assets/js/invite-api-health.js"></script>
+  <script defer src="assets/js/site-suggestion.js"></script>
 </body>
 </html>

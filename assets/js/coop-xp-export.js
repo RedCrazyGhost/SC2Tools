@@ -187,6 +187,7 @@ export function exportTasksAsIcs(tasks, options) {
     difficultyLabels: {},
     texts: {},
     filename: `coop-plan-${Date.now()}.ics`,
+    skipDownload: false,
     ...options
   };
   const exportingTasks = filterTasksByScope(tasks, settings.scope, settings.viewDate);
@@ -198,6 +199,8 @@ export function exportTasksAsIcs(tasks, options) {
     difficultyLabels: settings.difficultyLabels,
     texts: settings.texts
   });
-  downloadIcs(settings.filename, content);
-  return { ok: true, exportedTasks: exportingTasks.length, filename: settings.filename };
+  if (!settings.skipDownload) {
+    downloadIcs(settings.filename, content);
+  }
+  return { ok: true, exportedTasks: exportingTasks.length, filename: settings.filename, content };
 }

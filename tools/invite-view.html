@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="head.mutation.title">每周突变奖励经验列表 - 星际争霸2工具站</title>
-  <meta name="description" content="星际争霸2合作模式每周突变奖励经验列表：各档与累积奖励，包含休闲、普通、困难、残酷四档。" data-i18n-content="head.mutation.description">
-  <link rel="canonical" href="https://example.com/tools/mutation-reward-table.html">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="每周突变奖励经验列表" data-i18n-content="head.mutation.ogTitle">
-  <meta property="og:description" content="查看每周突变奖励各档经验及累积奖励。" data-i18n-content="head.mutation.ogDescription">
-  <meta property="og:url" content="https://example.com/tools/mutation-reward-table.html">
-  <meta name="twitter:card" content="summary">
+  <title data-i18n="head.inviteView.title">查看组队匹配 - 星际争霸2工具站</title>
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <!-- API 基址：留空则本地开发用 127.0.0.1:8080，生产用 http://154z1z6562.qicp.vip；可填覆盖 -->
+  <meta name="sc2-invite-api-base" content="">
+  <meta name="sc2-invite-assets-base" content="">
   <link rel="stylesheet" href="../assets/css/main.css">
   <link rel="stylesheet" href="../assets/css/site-suggestion.css">
+  <link rel="stylesheet" href="../assets/css/coop-xp.css">
+  <link rel="stylesheet" href="../assets/css/invite-public.css">
 </head>
 <body>
   <a class="skip-link" href="#main-content" data-i18n="common.skipToContent">跳到主要内容</a>
@@ -40,46 +40,28 @@
       </div>
     </div>
   </header>
-
   <main id="main-content" class="container">
-    <nav class="breadcrumb" aria-label="面包屑" data-i18n-aria-label="aria.breadcrumb">
-      <a href="../index.html" data-i18n="common.home">首页</a> / <a href="./coop-xp.html" data-i18n="common.calculator">经验计算器</a> / <span data-i18n="index.card.mutation.title">每周突变奖励经验列表</span>
-    </nav>
-
-    <section>
-      <h2 data-i18n="table.mutation.title">奖励档位与累积奖励</h2>
-      <div class="table-wrap card">
-        <table class="xp-table">
-          <thead>
-            <tr>
-              <th scope="col" data-i18n="table.mutation.col.difficulty">突变难度</th>
-              <th scope="col" data-i18n="table.mutation.col.single">单档奖励</th>
-              <th scope="col" data-i18n="table.mutation.col.cumulative">累积奖励（含低档）</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td data-i18n="difficulty.casual">休闲</td><td>25,000</td><td>25,000</td></tr>
-            <tr><td data-i18n="difficulty.normal">普通</td><td>35,000</td><td>60,000</td></tr>
-            <tr><td data-i18n="difficulty.hard">困难</td><td>50,000</td><td>110,000</td></tr>
-            <tr><td data-i18n="difficulty.brutal">残酷</td><td>75,000</td><td>185,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="hint" data-i18n="table.mutation.note">累积奖励口径：完成更高档时，包含该档及以下所有档位奖励。</p>
+    <section class="invite-pub-card">
+      <div id="invite-view-loading" role="status" aria-live="polite" data-i18n="inviteView.loading">正在加载邀请…</div>
+      <div id="invite-view-error" class="invite-pub-msg text-error" role="alert" hidden></div>
+      <article id="invite-view-content" hidden></article>
+      <p class="invite-pub-disclaimer hint" data-i18n="inviteView.footer">内容由邀请方提供 · 星际争霸2工具站</p>
     </section>
   </main>
-
   <footer class="site-footer">
     <div class="container">
       <p data-i18n="site.footer">© 2026 星际争霸2工具站</p>
     </div>
   </footer>
-  <script defer src="../assets/js/analytics-config.js"></script>
-  <script defer src="../assets/js/analytics.js"></script>
-  <script defer src="../assets/js/ga-lazy-loader.js"></script>
+  <script defer src="../assets/js/qrcode.min.js"></script>
   <script defer src="../assets/js/i18n.js"></script>
+  <script defer src="../assets/js/coop-xp-infra.js"></script>
+  <script defer src="../assets/js/coop-xp-domain.js"></script>
+  <script defer src="../assets/js/invite-calendar-preview.js"></script>
+  <script defer src="../assets/js/invite-validate.js"></script>
   <script defer src="../assets/js/invite-url.js"></script>
   <script defer src="../assets/js/invite-api-health.js"></script>
   <script defer src="../assets/js/site-suggestion.js"></script>
+  <script defer src="../assets/js/invite-view.js"></script>
 </body>
 </html>
