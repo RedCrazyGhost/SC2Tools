@@ -13,7 +13,7 @@
   var listeners = [];
   var inflight = null;
 
-  var PROD_INVITE_API_BASE = "http://154z1z6562.qicp.vip";
+  var PROD_INVITE_API_BASE = "http://api.redcrazyghost.vip";
   var DEV_INVITE_API_BASE = "http://127.0.0.1:8080";
 
   function metaContent(name) {

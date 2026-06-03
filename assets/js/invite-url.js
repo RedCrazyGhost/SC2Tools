@@ -13,7 +13,7 @@
     return String(raw || "").trim().replace(/\/+$/, "");
   }
 
-  var PROD_INVITE_API_BASE = "http://154z1z6562.qicp.vip";
+  var PROD_INVITE_API_BASE = "http://api.redcrazyghost.vip";
   var DEV_INVITE_API_BASE = "http://127.0.0.1:8080";
 
   function isLocalDevHost(hostname) {
@@ -39,12 +39,12 @@
     }
   }
 
-  /** 生产环境默认 API（花生壳反代 invite-service） */
+  /** 生产环境默认 API */
   function productionApiFallback() {
     return PROD_INVITE_API_BASE;
   }
 
-  /** API 基址：meta → localStorage → 本地 8080 → 生产 qicp.vip */
+  /** API 基址：meta → localStorage → 本地 8080 → 生产 api.redcrazyghost.vip */
   function apiBase() {
     var fromMeta = trimBase(metaContent("sc2-invite-api-base"));
     if (fromMeta) {

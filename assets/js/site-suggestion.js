@@ -41,7 +41,7 @@
     } catch (e) {
       /* ignore */
     }
-    return "http://154z1z6562.qicp.vip";
+    return "http://api.redcrazyghost.vip";
   }
 
   function hasDisallowedControlChars(s) {
