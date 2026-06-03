@@ -13,7 +13,7 @@
   var listeners = [];
   var inflight = null;
 
-  var PROD_INVITE_API_BASE = "http://api.redcrazyghost.vip";
+  var PROD_INVITE_API_HOST = "api.redcrazyghost.vip";
   var DEV_INVITE_API_BASE = "http://127.0.0.1:8080";
 
   function metaContent(name) {
@@ -51,7 +51,15 @@
   }
 
   function productionApiFallback() {
-    return PROD_INVITE_API_BASE;
+    var proto = "https:";
+    try {
+      if (window.location && window.location.protocol === "http:") {
+        proto = "http:";
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return proto + "//" + PROD_INVITE_API_HOST;
   }
 
   function apiBase() {

@@ -41,7 +41,15 @@
     } catch (e) {
       /* ignore */
     }
-    return "http://api.redcrazyghost.vip";
+    var proto = "https:";
+    try {
+      if (window.location && window.location.protocol === "http:") {
+        proto = "http:";
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return proto + "//api.redcrazyghost.vip";
   }
 
   function hasDisallowedControlChars(s) {

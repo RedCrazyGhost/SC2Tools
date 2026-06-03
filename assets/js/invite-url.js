@@ -13,7 +13,7 @@
     return String(raw || "").trim().replace(/\/+$/, "");
   }
 
-  var PROD_INVITE_API_BASE = "http://api.redcrazyghost.vip";
+  var PROD_INVITE_API_HOST = "api.redcrazyghost.vip";
   var DEV_INVITE_API_BASE = "http://127.0.0.1:8080";
 
   function isLocalDevHost(hostname) {
@@ -39,9 +39,17 @@
     }
   }
 
-  /** 生产环境默认 API */
+  /** 生产环境默认 API（与当前页协议一致，避免 HTTPS 页面请求 HTTP 被拦截） */
   function productionApiFallback() {
-    return PROD_INVITE_API_BASE;
+    var proto = "https:";
+    try {
+      if (window.location && window.location.protocol === "http:") {
+        proto = "http:";
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return proto + "//" + PROD_INVITE_API_HOST;
   }
 
   /** API 基址：meta → localStorage → 本地 8080 → 生产 api.redcrazyghost.vip */
